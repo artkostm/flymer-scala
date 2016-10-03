@@ -1,0 +1,52 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:1.3.1"
+        classpath "jp.leafytree.gradle:gradle-android-scala-plugin:1.4"
+    }
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+apply plugin: "com.android.application"
+apply plugin: "jp.leafytree.android-scala"
+
+android {
+    // Can be built with API Level 16 or higher, while this app retains runtime compatibility from API Level 10. Please refer to targetSdkVersion property
+    compileSdkVersion "android-23"
+    buildToolsVersion "23.0.3"
+	
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled true
+            proguardFile file("proguard-rules.txt")
+        }
+
+        release {
+            minifyEnabled true
+            proguardFile file("proguard-rules.txt")
+        }
+    }
+}
+
+dependencies {
+    compile "org.scala-lang:scala-library:2.11.7"
+	compile "org.scaloid:scaloid_2.11:4.0"
+    compile "org.macroid:macroid_2.11:2.0.0-M5"
+    compile "org.macroid:macroid-viewable_2.11:2.0.0-M5"
+}
