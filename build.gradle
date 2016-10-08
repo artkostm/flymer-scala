@@ -49,4 +49,5 @@ dependencies {
 	compile "org.scaloid:scaloid_2.11:4.0"
     compile "org.macroid:macroid_2.11:2.0.0-M5"
     compile "org.macroid:macroid-viewable_2.11:2.0.0-M5"
+    compile 'org.jsoup:jsoup:1.9.2'
 }
