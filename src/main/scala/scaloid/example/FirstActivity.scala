@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.View.OnClickListener
 import android.widget.{EditText, LinearLayout, TextView, Toast}
+import com.artkostm.flymer.login.Login.Dkey
 import com.artkostm.flymer.view.Tweaks
 import macroid.{Contexts, Ui}
 import macroid.FullDsl._
@@ -29,7 +30,7 @@ class FirstActivity extends Activity with Contexts[Activity] {
 
     label.get.setOnClickListener {
       new OnClickListener {
-        override def onClick(v: View): Unit = Toast.makeText(FirstActivity.this, "Hello, Lol!", Toast.LENGTH_LONG).show();
+        override def onClick(v: View): Unit = Toast.makeText(FirstActivity.this, "Hello, Lol!" + Dkey("5ZfwGo0Ilv0C3ap6"), Toast.LENGTH_LONG).show();
       }
     }
   }
