@@ -19,12 +19,11 @@ apply plugin: "com.android.application"
 apply plugin: "jp.leafytree.android-scala"
 
 android {
-    // Can be built with API Level 16 or higher, while this app retains runtime compatibility from API Level 10. Please refer to targetSdkVersion property
     compileSdkVersion "android-23"
     buildToolsVersion "23.0.3"
 	
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 20
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -46,7 +45,6 @@ android {
 
 dependencies {
     compile "org.scala-lang:scala-library:2.11.7"
-	compile "org.scaloid:scaloid_2.11:4.0"
     compile "org.macroid:macroid_2.11:2.0.0-M5"
     compile "org.macroid:macroid-viewable_2.11:2.0.0-M5"
     compile 'org.jsoup:jsoup:1.9.2'
