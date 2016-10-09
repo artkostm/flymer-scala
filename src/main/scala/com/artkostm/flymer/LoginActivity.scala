@@ -18,7 +18,7 @@ import scala.concurrent.Future
 /**
  * Created by artsiom.chuiko on 03/10/2016.
  */
-class FirstActivity extends Activity with Contexts[Activity] {
+class LoginActivity extends Activity with Contexts[Activity] {
   override def onCreate(savedInstanceState: Bundle): Unit = {
     super.onCreate(savedInstanceState)
 
@@ -36,7 +36,7 @@ class FirstActivity extends Activity with Contexts[Activity] {
       Future {
         AttemptLogin("artkostm@gmail.com", "061994art")
       } map { value =>
-        runOnUiThread { Toast.makeText(FirstActivity.this, value, Toast.LENGTH_LONG).show() }
+        runOnUiThread { Toast.makeText(LoginActivity.this, value, Toast.LENGTH_LONG).show() }
       }
     }
   }
