@@ -37,7 +37,7 @@ class LoginActivity extends Activity with Contexts[Activity] {
       Future {
         AttemptLogin(email.get.getText, password.get.getText)
       } map { value =>
-        runOnUiThread { Toast.makeText(LoginActivity.this, value, Toast.LENGTH_LONG).show() }
+        runOnUiThread { Toast.makeText(LoginActivity.this, value.toString, Toast.LENGTH_LONG).show() }
       }
     }
   }

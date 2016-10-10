@@ -4,6 +4,8 @@ import android.os.{Handler, Message}
 import android.util.Log
 import org.jsoup.{Connection, Jsoup}
 
+import scala.util.Try
+
 /**
   * Created by arttsiom.chuiko on 08/10/2016.
   */
@@ -15,8 +17,7 @@ object Login {
     })
   }
 
-  def AttemptLogin(email: String, pass: String): String = {
-    try{
+  def AttemptLogin(email: String, pass: String): LoginInfo = {
       val connection = Jsoup.connect("http://flymer.ru")
       connection.userAgent("Mozilla").method(Connection.Method.GET)
       val doc = connection.get()
@@ -42,17 +43,14 @@ object Login {
       cookies.put("lkey", lkey);
       cookies.put("dkey", String.valueOf(dkey))
 
-      "ac:"+ac+"\nsid:"+cookies.get("sid")
-    } catch {
-      case e: Exception => {
-        Log.i("scala", e.getMessage, e)
-        e.printStackTrace()
-        e.getMessage }
-    }
-
+      new LoginInfo(ac, fkey, cookies.get("sid"))
   }
 }
 
 class Login {
 
+}
+
+case class LoginInfo(ac: String, fkey: String, sid: String) {
+  override def toString: String = "{ac:" + ac + "\nfkey:" + fkey + "\nsid:" + sid + "}"
 }
