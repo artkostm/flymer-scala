@@ -14,4 +14,7 @@ object ViewHelper {
   implicit def toOnClickListener[V <: View](handler: V => Any) = new View.OnClickListener {
     override def onClick(source: View): Unit = handler(source.asInstanceOf[V])
   }
+
+  implicit def charSequenceToString(str: CharSequence) = str.toString
+
 }

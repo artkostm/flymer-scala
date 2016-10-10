@@ -3,7 +3,6 @@ package com.artkostm.flymer
 import android.app.Activity
 import android.os.Bundle
 import android.view.View
-import android.view.View.OnClickListener
 import android.widget._
 import com.artkostm.flymer.login.Login.AttemptLogin
 import com.artkostm.flymer.view.Tweaks
@@ -23,10 +22,12 @@ class LoginActivity extends Activity with Contexts[Activity] {
     super.onCreate(savedInstanceState)
 
     var label = slot[Button]
+    var email = slot[TextView]
+    var password = slot[TextView]
 
     val mainView = l[LinearLayout] (
-      w[EditText] <~ matchWidth,
-      w[EditText] <~ matchWidth <~ Tweaks.password,
+      w[EditText] <~ matchWidth <~ wire(email),
+      w[EditText] <~ matchWidth <~ wire(password) <~ Tweaks.password,
       w[Button] <~ matchWidth <~ wire(label) <~ text("Log in")
     ) <~ vertical
 
@@ -34,7 +35,7 @@ class LoginActivity extends Activity with Contexts[Activity] {
 
     label.get.setOnClickListener { source: View =>
       Future {
-        AttemptLogin("artkostm@gmail.com", "061994art")
+        AttemptLogin(email.get.getText, password.get.getText)
       } map { value =>
         runOnUiThread { Toast.makeText(LoginActivity.this, value, Toast.LENGTH_LONG).show() }
       }
