@@ -5,7 +5,7 @@ import android.widget.EditText
 import macroid.Tweak
 
 /**
-  * Created by arttsiom.chuiko on 08/10/2016.
+  * Created by artsiom.chuiko on 08/10/2016.
   */
 object Tweaks {
   def password() = {
