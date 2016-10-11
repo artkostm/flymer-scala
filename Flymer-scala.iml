@@ -121,8 +121,8 @@
     <orderEntry type="library" exported="" name="macroid-viewable_2.11-2.0.0-M5" level="project" />
     <orderEntry type="library" exported="" name="scala-compiler-2.11.7" level="project" />
     <orderEntry type="library" exported="" name="macro-compat_2.11-1.1.1" level="project" />
-    <orderEntry type="library" exported="" name="scala-async_2.11-0.9.5" level="project" />
     <orderEntry type="library" exported="" name="scala-parser-combinators_2.11-1.0.4" level="project" />
+    <orderEntry type="library" exported="" name="scala-async_2.11-0.9.5" level="project" />
     <orderEntry type="library" exported="" name="macroid_2.11-2.0.0-M5" level="project" />
     <orderEntry type="library" exported="" name="multidex-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-v4-23.1.1" level="project" />
