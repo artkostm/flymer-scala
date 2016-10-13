@@ -51,4 +51,5 @@ dependencies {
     compile "org.macroid:macroid_2.11:2.0.0-M5"
     compile "org.macroid:macroid-viewable_2.11:2.0.0-M5"
     compile 'org.jsoup:jsoup:1.9.2'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
 }
