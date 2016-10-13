@@ -2,10 +2,9 @@ package com.artkostm.flymer
 
 import android.app.Activity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget._
-import com.artkostm.flymer.login.Login.AttemptLogin
+import com.artkostm.flymer.communication.login.Login.AttemptLogin
 import com.artkostm.flymer.view.Tweaks
 import macroid.Contexts
 import macroid.FullDsl._
