@@ -14,6 +14,7 @@ buildscript {
 repositories {
     jcenter()
     mavenCentral()
+    maven { url "https://jitpack.io" }
 }
 
 apply plugin: "com.android.application"
@@ -52,4 +53,6 @@ dependencies {
     compile "org.macroid:macroid-viewable_2.11:2.0.0-M5"
     compile 'org.jsoup:jsoup:1.9.2'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile 'com.squareup.okhttp3:okhttp-urlconnection:3.4.1'
+    compile 'com.github.franmontiel:PersistentCookieJar:v1.0.0'
 }
