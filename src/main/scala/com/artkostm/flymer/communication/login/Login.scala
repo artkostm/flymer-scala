@@ -2,8 +2,9 @@ package com.artkostm.flymer.communication.login
 
 import org.jsoup.nodes.Document
 import org.jsoup.{Connection, Jsoup}
+import com.artkostm.flymer.communication.{Flymer => flymer}
 
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 /**
   * Created by artsiom.chuiko on 08/10/2016.
@@ -17,31 +18,33 @@ object Login {
     })
   }
 
-  def AttemptLogin(email: String, pass: String): Try[LoginInfo] = requestLoginPage() match {
-    case Success(con) => {
-      val doc = con.get
-      val cookies = con.response.cookies
-      val fkey = getAttr(doc, "input[name='fkey']", "value")
-      val lkey = getAttr(doc, "input[name='lkey']", "value")
-      val dkey = Dkey(fkey)
-      cookies.put("fkey", fkey)
-      val ac = requestAccount(email, pass, fkey, lkey, dkey, cookies)
-      Success(new LoginInfo(ac.get, fkey, cookies.get("sid")))
-    }
+  def AttemptLogin(email: String, pass: String): Try[LoginInfo] = Try({
+    val con = requestLoginPage()
+    val doc = con.get
+    val cookies = con.response.cookies
+    val fkey = getAttr(doc, flymer.FkeyCssSelector, "value")
+    val lkey = getAttr(doc, flymer.LkeyCssSelector, "value")
+    val dkey = Dkey(fkey)
+    cookies.put(flymer.Fkey, fkey)
+    val ac = requestAccount(email, pass, fkey, lkey, dkey, cookies)
+    new LoginInfo(ac, fkey, cookies.get(flymer.Sid))
+  })
 
-    case Failure(e) => Failure(e)
-  }
+  protected def requestLoginPage(): Connection = Jsoup.connect(flymer.BaseUrl).userAgent(flymer.UserAgent).method(Connection.Method.GET)
 
-  protected def requestLoginPage(): Try[Connection] = Try(Jsoup.connect("http://flymer.ru").userAgent("Mozilla").method(Connection.Method.GET))
-
-  protected def requestAccount(email: String, pass: String, fkey: String, lkey: String, dkey: Int, cookies: java.util.Map[String, String]): Try[String] = Try(
-    Jsoup.connect(s"http://flymer.ru/req/login?ts=${System.currentTimeMillis}").
-      data("pass", pass).data("email", email).data("fkey",fkey).data("lkey",lkey).data("dkey",String.valueOf(dkey)).
-      header("Content-Type", "application/x-www-form-urlencoded").header("Connection", "keep-alive").
+  protected def requestAccount(email: String, pass: String, fkey: String, lkey: String,
+                               dkey: Int, cookies: java.util.Map[String, String]): String = {
+    Jsoup.connect(flymer.LoginUrl(System.currentTimeMillis)).
+      data(flymer.Pass, pass).data(flymer.Email, email).
+      data(flymer.Fkey, fkey).data(flymer.Lkey, lkey).
+      data(flymer.Dkey, String.valueOf(dkey)).
+      header("Content-Type", "application/x-www-form-urlencoded").
+      header("Connection", "keep-alive").
       cookies(cookies).
       method(Connection.Method.POST).
       execute().
-      cookie("ac"))
+      cookie(flymer.Ac)
+  }
 
   protected def getAttr(doc: Document, cssSelector: String, attrName: String): String = doc.select(cssSelector).first.attr(attrName)
 
