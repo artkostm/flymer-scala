@@ -5,7 +5,7 @@ import android.view.View
 /**
   * Created by artsiom.chuiko on 08/10/2016.
   */
-object ViewHelper {
+object FlymerHelper {
 
   implicit def toRun(handler: => Unit) = new Runnable {
     override def run(): Unit = handler
