@@ -9,10 +9,18 @@
     public protected *;
 }
 
+-keep class com.artkostm.flymer.service.PipelineService
+
 -keepclassmembers enum * {
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
 
 # this can be omitted if current Android Build target is android-16
--dontwarn org.scaloid.** 
+-dontwarn org.scaloid.**
+
+-dontwarn java.nio.file.*
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn android.support.v4.**
