@@ -7,6 +7,10 @@ import com.google.android.gms.gcm.{GcmNetworkManager, GcmTaskService, TaskParams
   */
 class PipelineService extends GcmTaskService {
   override def onRunTask(taskParams: TaskParams): Int = {
+//    import com.artkostm.flymer.communication.okhttp3.Client._
+//    implicit val context = getApplicationContext
+//    implicit val client = RegisterClient(context)
+//    CheckReplies()
 
     GcmNetworkManager.RESULT_SUCCESS
   }
