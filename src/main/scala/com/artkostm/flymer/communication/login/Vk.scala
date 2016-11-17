@@ -4,7 +4,7 @@ import android.app.Dialog
 import android.content.Context
 
 /**
-  * Created by arttsiom.chuiko on 15/10/2016.
+  * Created by artsiom.chuiko on 15/10/2016.
   */
 object Vk {
 

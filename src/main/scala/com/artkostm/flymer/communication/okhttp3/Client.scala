@@ -1,6 +1,7 @@
 package com.artkostm.flymer.communication.okhttp3
 
 import android.content.Context
+import android.widget.Toast
 import com.artkostm.flymer.communication.login.LoginInfo
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
@@ -8,7 +9,7 @@ import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersisto
 import okhttp3.{Cookie, OkHttpClient}
 import com.artkostm.flymer.communication.{Flymer => flymer}
 
-import scala.collection.mutable.{ListBuffer}
+import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConverters._
 
 /**
@@ -21,6 +22,20 @@ object Client {
     new OkHttpClient.Builder().cookieJar(cookieJar).build()
   }
 
+  def CheckReplies()(implicit okHttp: OkHttpClient, context: Context) = {
+    import io.taig.communicator._
+    //import scala.concurrent.ExecutionContext.Implicits.global
+    import com.artkostm.flymer.app.Executor._
+    //implicit val client = okHttp
+    Request
+      .prepare("http://www.scala-lang.org/")
+      .start[String]()
+      .onReceive {
+        case _ => println
+      }(Ui)
+      .done { case Response(_, body) => Toast.makeText(context, body, Toast.LENGTH_LONG).show }
+  }
+
   implicit def logInfoToCookies(loginInfo: LoginInfo): java.util.List[Cookie] = {
     val buffer = ListBuffer.empty[Cookie]
     buffer += buildCookie(flymer.Fkey, loginInfo.fkey)
@@ -31,7 +46,7 @@ object Client {
   }
 
   protected def buildCookie(name: String, value: String): Cookie = new Cookie.Builder().
-    domain("flymer.ru").
+    domain(flymer.Domain).
     path("/").
     name(name).
     value(value).
