@@ -4,7 +4,8 @@ package com.artkostm.flymer.communication
   * Created by artsiom.chuiko on 13/10/2016.
   */
 object Flymer {
-  val BaseUrl = "http://flymer.ru"
+  val Domain = "flymer.ru"
+  val BaseUrl = s"http://$Domain"
   def LoginUrl(currentTime: Long) = s"$BaseUrl/req/login?ts=$currentTime"
 
   val Fkey = "fkey"
