@@ -20,7 +20,12 @@
 -dontwarn org.scaloid.**
 
 -dontwarn java.nio.file.*
+-dontwarn android.support.customtabs.**
+-dontwarn android.net.http.**
+-dontwarn org.apache.http.**
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 -dontwarn okhttp3.**
 -dontwarn okio.**
 -dontwarn android.support.v4.**
+-dontwarn android.support.v7.**
+-dontwarn com.google.android.gms.internal.**
