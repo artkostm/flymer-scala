@@ -26,6 +26,7 @@ class LoginActivity extends Activity with Contexts[Activity] {
   override def onCreate(savedInstanceState: Bundle): Unit = {
     super.onCreate(savedInstanceState)
 
+    Log.i("SCALA", "TEST_TEST")
     var label = slot[Button]
     var email = slot[TextView]
     var password = slot[TextView]
@@ -55,16 +56,15 @@ class LoginActivity extends Activity with Contexts[Activity] {
 
   private def runService(): Unit = {
     val gcmManager = GcmNetworkManager.getInstance(LoginActivity.this)
-//    Log.i("SCALA", s"Class: ${classOf[PipelineService]}")
-//    val task = new PeriodicTask.Builder().
-//      setService(classOf[TestService]).
-//      setPeriod(60).
-//      setFlex(10).
-//      setTag("flymer_periodic_task").
-//      setPersisted(true).
-//      build()
+    val task = new PeriodicTask.Builder().
+      setService(classOf[PipelineService]).
+      setPeriod(20).
+      setFlex(10).
+      setTag(PipelineService.Tag).
+      //setPersisted(true).
+      build()
     val resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(LoginActivity.this)
-    if (ConnectionResult.SUCCESS == resultCode) Toast.makeText(LoginActivity.this, "Founded Google services", Toast.LENGTH_SHORT).show //gcmManager.schedule(task)
+    if (ConnectionResult.SUCCESS == resultCode) gcmManager.schedule(task)
     else Toast.makeText(LoginActivity.this, "Cannot run Google services", Toast.LENGTH_SHORT).show
   }
 }
