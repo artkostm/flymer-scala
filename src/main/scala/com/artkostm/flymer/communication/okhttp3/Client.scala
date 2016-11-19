@@ -1,13 +1,15 @@
 package com.artkostm.flymer.communication.okhttp3
 
+import android.app.Service
 import android.content.Context
-import android.widget.Toast
+import android.util.Log
 import com.artkostm.flymer.communication.login.LoginInfo
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import okhttp3.{Cookie, OkHttpClient}
 import com.artkostm.flymer.communication.{Flymer => flymer}
+import macroid.ContextWrapper
 
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConverters._
@@ -17,23 +19,17 @@ import scala.collection.JavaConverters._
   */
 object Client {
 
-  def RegisterClient(context: Context): OkHttpClient = {
-    val cookieJar = new PersistentCookieJar(new SetCookieCache, new SharedPrefsCookiePersistor(context))
-    new OkHttpClient.Builder().cookieJar(cookieJar).build()
-  }
-
-  def CheckReplies()(implicit okHttp: OkHttpClient, context: Context) = {
+  def CheckReplies()(implicit okHttp: OkHttpClient, ctx: ContextWrapper) = {
     import io.taig.communicator._
-    //import scala.concurrent.ExecutionContext.Implicits.global
     import com.artkostm.flymer.app.Executor._
-    //implicit val client = okHttp
+    import scala.concurrent.ExecutionContext.Implicits.global
     Request
       .prepare("http://www.scala-lang.org/")
       .start[String]()
       .onReceive {
-        case _ => println
+        case x => Log.i("SCALA", x.toString())
       }(Ui)
-      .done { case Response(_, body) => Toast.makeText(context, body, Toast.LENGTH_LONG).show }
+      .done { case Response(_, body) => Log.i("SCALA", body) } (Ui)
   }
 
   implicit def logInfoToCookies(loginInfo: LoginInfo): java.util.List[Cookie] = {
@@ -55,6 +51,7 @@ object Client {
     build()
 }
 
-class Client {
-
+trait HttpClientHolder { self: Service =>
+  lazy val cookieJar = new PersistentCookieJar(new SetCookieCache, new SharedPrefsCookiePersistor(self))
+  implicit lazy val okHttpClient = new OkHttpClient.Builder().cookieJar(cookieJar).build()
 }
