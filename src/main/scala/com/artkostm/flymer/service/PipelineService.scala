@@ -6,19 +6,17 @@ import android.content.{Context, Intent}
 import android.support.v4.app.{NotificationCompat, TaskStackBuilder}
 import android.util.Log
 import com.artkostm.flymer.LoginActivity
+import com.artkostm.flymer.communication.okhttp3.HttpClientHolder
 import com.google.android.gms.gcm.{GcmNetworkManager, GcmTaskService, TaskParams}
 import macroid.Contexts
 
 /**
   * Created by artsiom.chuiko on 10/10/2016.
   */
-class PipelineService extends GcmTaskService with Contexts[GcmTaskService]{
+class PipelineService extends GcmTaskService with Contexts[GcmTaskService] with HttpClientHolder{
   override def onRunTask(taskParams: TaskParams): Int = {
-//    import com.artkostm.flymer.communication.okhttp3.Client._
-//    implicit val context = getApplicationContext
-//    implicit val client = RegisterClient(context)
-//    CheckReplies()
-//    Toast.makeText(getApplicationContext, "Google services", Toast.LENGTH_SHORT).show
+    import com.artkostm.flymer.communication.okhttp3.Client._
+    CheckReplies()
     Log.i("SCALA", s"Task is ${taskParams.getTag}")
     sendNotification()
     GcmNetworkManager.RESULT_SUCCESS
