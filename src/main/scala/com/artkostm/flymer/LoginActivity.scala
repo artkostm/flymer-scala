@@ -56,11 +56,8 @@ class LoginActivity extends Activity with Contexts[Activity] {
 
   private def runService(): Unit = {
     val gcmManager = GcmNetworkManager.getInstance(LoginActivity.this)
-    val task = new PeriodicTask.Builder().
-      setService(classOf[PipelineService]).
-      setPeriod(20).
-      setFlex(10).
-      setTag(PipelineService.Tag).
+    val task = new PeriodicTask.Builder().setService(classOf[PipelineService]).
+      setPeriod(20). setFlex(10). setTag(PipelineService.Tag).
       //setPersisted(true).
       build()
     val resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(LoginActivity.this)
