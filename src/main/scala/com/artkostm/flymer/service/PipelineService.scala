@@ -20,11 +20,10 @@ import scala.concurrent.duration.Duration
   * Created by artsiom.chuiko on 10/10/2016.
   */
 class PipelineService extends GcmTaskService with Contexts[GcmTaskService] {
-  private lazy val cookieJar = new PersistentCookieJar(new SetCookieCache, new SharedPrefsCookiePersistor(Application.getContext))
-  implicit lazy val okHttpClient = new OkHttpClient.Builder().cookieJar(cookieJar).build()
 
   override def onRunTask(taskParams: TaskParams): Int = {
     import com.artkostm.flymer.communication.okhttp3.Client._
+    import com.artkostm.flymer.communication.okhttp3.ClientHolder._
     print()
     val request = CheckReplies()
     import com.artkostm.flymer.Application._

@@ -1,8 +1,12 @@
 package com.artkostm.flymer.communication.okhttp3
 
+import com.artkostm.flymer.Application
 import com.artkostm.flymer.communication.login.LoginInfo
 import okhttp3.{Cookie, OkHttpClient}
 import com.artkostm.flymer.communication.{Flymer => flymer}
+import com.franmontiel.persistentcookiejar.PersistentCookieJar
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import macroid.ContextWrapper
 
 import scala.collection.mutable.ListBuffer
@@ -41,4 +45,9 @@ object Client {
     httpOnly().
     secure().
     build()
+}
+
+object ClientHolder {
+  private lazy val cookieJar = new PersistentCookieJar(new SetCookieCache, new SharedPrefsCookiePersistor(Application.getContext))
+  implicit lazy val okHttpClient = new OkHttpClient.Builder().cookieJar(cookieJar).build()
 }
