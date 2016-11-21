@@ -5,29 +5,43 @@ import android.app.{NotificationManager, PendingIntent}
 import android.content.{Context, Intent}
 import android.support.v4.app.{NotificationCompat, TaskStackBuilder}
 import android.util.Log
-import com.artkostm.flymer.LoginActivity
-import com.artkostm.flymer.communication.okhttp3.HttpClientHolder
+import com.artkostm.flymer.{Application, LoginActivity}
+import com.franmontiel.persistentcookiejar.PersistentCookieJar
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import com.google.android.gms.gcm.{GcmNetworkManager, GcmTaskService, TaskParams}
+import io.taig.communicator.Response
 import macroid.Contexts
+import okhttp3.OkHttpClient
+
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 /**
   * Created by artsiom.chuiko on 10/10/2016.
   */
-class PipelineService extends GcmTaskService with Contexts[GcmTaskService] with HttpClientHolder{
+class PipelineService extends GcmTaskService with Contexts[GcmTaskService] {
+  private lazy val cookieJar = new PersistentCookieJar(new SetCookieCache, new SharedPrefsCookiePersistor(Application.getContext))
+  implicit lazy val okHttpClient = new OkHttpClient.Builder().cookieJar(cookieJar).build()
+
   override def onRunTask(taskParams: TaskParams): Int = {
     import com.artkostm.flymer.communication.okhttp3.Client._
-    CheckReplies()
-    Log.i("SCALA", s"Task is ${taskParams.getTag}")
-    sendNotification()
+    print()
+    val request = CheckReplies()
+    import com.artkostm.flymer.Application._
+    request.done {
+      case Response(code, body) => sendNotification(body)
+    } (Ui)
+    Await.result(request, Duration.Inf)
     GcmNetworkManager.RESULT_SUCCESS
   }
 
-  def sendNotification(): Unit = {
+  def sendNotification(body: String): Unit = {
     val mBuilder =
       new NotificationCompat.Builder(this)
         .setSmallIcon(R.drawable.ic_dialog_map)
         .setContentTitle("Flymer")
-        .setContentText("Hello World!")
+        .setContentText(body)
     val resultIntent = new Intent(this, classOf[LoginActivity])
     val stackBuilder = TaskStackBuilder.create(this)
     stackBuilder.addParentStack(classOf[LoginActivity])
@@ -36,6 +50,10 @@ class PipelineService extends GcmTaskService with Contexts[GcmTaskService] with 
     mBuilder.setContentIntent(resultPendingIntent)
     val mNotificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE).asInstanceOf[NotificationManager]
     mNotificationManager.notify(1, mBuilder.build())
+  }
+
+  def print()(implicit okHttpClient: OkHttpClient): Unit = {
+    Log.i("SCALA", s"Http Client is ${okHttpClient}")
   }
 }
 
