@@ -20,3 +20,6 @@ object Flymer {
 
   val UserAgent = "Mozilla"
 }
+
+case class FlymerError(errorType: String)
+case class FlymerResponse(error: FlymerError)
