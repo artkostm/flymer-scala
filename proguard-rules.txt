@@ -11,6 +11,11 @@
 
 -keep class com.artkostm.flymer.service.PipelineService
 
+-keep class io.taig.communicator.Interceptor$* {
+    *;
+}
+-keep class io.taig.communicator.body.Response
+
 -keepclassmembers enum * {
     public static **[] values();
     public static ** valueOf(java.lang.String);
