@@ -1,4 +1,4 @@
-package com.artkostm.flymer
+package com.artkostm.flymer.communication
 
 import java.util.concurrent.Executor
 
@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext
 /**
   * Created by artsiom.chuiko on 17/11/2016.
   */
-package object app {
+package object okhttp3 {
   val Executor = new {
 
     implicit lazy val Pool = ExecutionContext.fromExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
