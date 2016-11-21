@@ -13,7 +13,6 @@ import macroid.contrib.LpTweaks._
 import com.artkostm.flymer.utils.FlymerHelper._
 import com.google.android.gms.gcm.{GcmNetworkManager, PeriodicTask}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 import com.artkostm.flymer.service.PipelineService
@@ -40,24 +39,23 @@ class LoginActivity extends Activity with Contexts[Activity] {
     setContentView(mainView.get)
     runService
 
+    import com.artkostm.flymer.Application._
     label.get.setOnClickListener { source: View =>
       Future {
         AttemptLogin(email.get.getText, password.get.getText)
-      } map { value => value match {
-          case Success(loginInfo) => runOnUiThread {
-            Toast.makeText(LoginActivity.this, loginInfo.toString, Toast.LENGTH_LONG).show
+      }.map { value => value match {
+          case Success(loginInfo) =>  Toast.makeText(LoginActivity.this, loginInfo.toString, Toast.LENGTH_LONG).show
 //            getSharedPreferences("CookiePersistence", Context.MODE_PRIVATE).edit().
-          }
-          case Failure(e) => runOnUiThread { Toast.makeText(LoginActivity.this, e.getMessage, Toast.LENGTH_LONG).show }
+          case Failure(e) => Toast.makeText(LoginActivity.this, e.getMessage, Toast.LENGTH_LONG).show
         }
-      }
+      } (Ui)
     }
   }
 
   private def runService(): Unit = {
     val gcmManager = GcmNetworkManager.getInstance(LoginActivity.this)
     val task = new PeriodicTask.Builder().setService(classOf[PipelineService]).
-      setPeriod(20). setFlex(10). setTag(PipelineService.Tag).
+      setPeriod(30). setFlex(10). setTag(PipelineService.Tag).
       //setPersisted(true).
       build()
     val resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(LoginActivity.this)
