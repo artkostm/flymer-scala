@@ -1,11 +1,10 @@
 package com.artkostm.flymer.service
 
-import android.R
 import android.app.{NotificationManager, PendingIntent}
 import android.content.{Context, Intent}
 import android.support.v4.app.{NotificationCompat, TaskStackBuilder}
 import android.util.Log
-import com.artkostm.flymer.{Application, LoginActivity}
+import com.artkostm.flymer.{Application, LoginActivity, R}
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
@@ -39,7 +38,7 @@ class PipelineService extends GcmTaskService with Contexts[GcmTaskService] {
   def sendNotification(body: String): Unit = {
     val mBuilder =
       new NotificationCompat.Builder(this)
-        .setSmallIcon(R.drawable.ic_dialog_map)
+        .setSmallIcon(R.drawable.ic_notification)
         .setContentTitle("Flymer")
         .setContentText(body)
     val resultIntent = new Intent(this, classOf[LoginActivity])
