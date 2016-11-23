@@ -5,15 +5,16 @@ import android.os.Bundle
 import android.support.design.widget.TextInputLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.AppCompatButton
+import android.text.Html
 import android.util.Patterns
-import android.view.{Gravity, View, ViewGroup}
+import android.view.Gravity
 import android.view.ViewGroup.LayoutParams
 import android.widget._
 import com.artkostm.flymer.communication.login.Login.AttemptLogin
 import com.artkostm.flymer.view.Tweaks
-import macroid.{ContextWrapper, Contexts}
+import macroid.Contexts
 import macroid.FullDsl._
-import macroid.contrib.LpTweaks._
+import macroid._
 import com.artkostm.flymer.utils.FlymerHelper._
 import com.google.android.gms.gcm.{GcmNetworkManager, PeriodicTask}
 
@@ -21,7 +22,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success}
 import com.artkostm.flymer.service.PipelineService
 import com.google.android.gms.common.{ConnectionResult, GoogleApiAvailability}
-import macroid.contrib.ImageTweaks
+import macroid.contrib.{ImageTweaks, TextTweaks}
 
 /**
  * Created by artsiom.chuiko on 03/10/2016.
@@ -38,10 +39,10 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
       l[LinearLayout] (
         w[ImageView]
           <~ ImageTweaks.res(R.drawable.logo)
-          <~ Tweaks.mp(LayoutParams.WRAP_CONTENT, 76, bottom = 24, gravity = Gravity.CENTER_HORIZONTAL),
+          <~ Tweaks.mp(LayoutParams.WRAP_CONTENT, 76 dp, bottom = 24 dp, gravity = Gravity.CENTER_HORIZONTAL),
         l[TextInputLayout](
           w[EditText]
-            <~ Tweaks.mp(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, top = 8, bottom = 8)
+            <~ Tweaks.mp(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, top = 8 dp, bottom = 8 dp)
             <~ wire(emailSlot)
             <~ hint("Email")
             <~ Tweaks.emailInputType
@@ -49,35 +50,49 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
           <~ lp[LinearLayout](LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT),
         l[TextInputLayout](
           w[EditText]
-            <~ Tweaks.mp(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, top = 8, bottom = 8)
+            <~ Tweaks.mp(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, top = 8 dp, bottom = 8 dp)
             <~ wire(passwordSlot)
             <~ hint("Password")
             <~ Tweaks.password
         ) <~ vertical
           <~ lp[LinearLayout](LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT),
         w[AppCompatButton]
-          <~ matchWidth
           <~ wire(loginBtn)
           <~ text("Login")
-          <~ padding(all = 12)
-          <~ Tweaks.mp(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, left = 24, right = 24)
+          <~ padding(all = 12 dp)
+          <~ Tweaks.mp(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, top = 24 dp, bottom = 24 dp)
+          <~ On.click(flymerLogin),
+        w[TextView]
+          <~ text("Login via Vk")
+          <~ TextTweaks.size(16)
+          <~ Tweaks.mp(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT, bottom = 24 dp)
+          <~ Tweaks.textGravity(Gravity.CENTER)
+          <~ Tweaks.clickable[TextView]
+          <~ Tweaks.textFocusableInTouchMode
+          <~ On.click(vkLogin)
       ) <~ vertical
-        <~ padding(top = 56, left = 24, right = 24)
-    ) <~ Tweaks.fitsSystemWindow(true)).get)
-    //runService
+        <~ padding(top = 56 dp, left = 24 dp, right = 24 dp)
+    ) <~ Tweaks.fitsSystemWindow(true) <~ Tweaks.fillViewport).get)
+  }
 
-    import com.artkostm.flymer.Application._
-    loginBtn.get.setOnClickListener { source: View =>
+  lazy val flymerLogin: Ui[Unit] = Ui {
+    if(validate()) {
       val dialog = openDialog()
+      import com.artkostm.flymer.Application._
       Future {
         AttemptLogin(emailSlot.get.getText, passwordSlot.get.getText)
-      }.map { value => value match {
-          case Success(loginInfo) =>  { dialog.dismiss(); Toast.makeText(LoginActivity.this, loginInfo.toString, Toast.LENGTH_LONG).show }
-//            getSharedPreferences("CookiePersistence", Context.MODE_PRIVATE).edit().
-          case Failure(e) => { dialog.dismiss(); Toast.makeText(LoginActivity.this, e.getMessage, Toast.LENGTH_LONG).show }
+      } mapUi { loginInfoTry =>
+        dialog.dismiss()
+        loginInfoTry match {
+          case Success(loginInfo) =>  toast(loginInfo.toString) <~ long <~ fry //runService
+          case Failure(e) => toast(e.getMessage) <~ long <~ fry
         }
-      } (Ui)
+      }
     }
+  }
+
+  lazy val vkLogin: Ui[Unit] = Ui {
+    toast("Sorry, not supported yet") <~ long <~ fry
   }
 
   override def onBackPressed(): Unit = moveTaskToBack(true)
@@ -98,9 +113,9 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
   private def validate(): Boolean = {
     val email = emailSlot.get.getText.toString
     val password = passwordSlot.get.getText.toString
-
+    var valid = true
     def validateEmail(): Boolean = if (email.isEmpty || !Patterns.EMAIL_ADDRESS.matcher(email).matches) {
-      emailSlot.get.setError("enter a valid email address")
+      emailSlot.get.setError(Html.fromHtml("<font color='red'>enter a valid email address</font>"))
       false
     } else {
       emailSlot.get.setError(null)
@@ -108,14 +123,15 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
     }
 
     def validatePassword(): Boolean = if (password.isEmpty || password.length < 4 || password.length > 20) {
-      passwordSlot.get.setError("between 4 and 20 alphanumeric characters")
+      passwordSlot.get.setError(Html.fromHtml("<font color='red'>between 4 and 20 alphanumeric characters</font>"))
       false
     } else {
       passwordSlot.get.setError(null)
       true
     }
 
-    validateEmail() && validatePassword()
+    valid &&= validateEmail()
+    valid && validatePassword()
   }
 
   private def openDialog(): ProgressDialog = {
