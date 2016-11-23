@@ -4,10 +4,6 @@
 
     </style>
 
-    <style name="SplashTheme" parent="android:Theme.DeviceDefault.Light.NoActionBar">
-        <item name="android:windowBackground">@drawable/splash_screen</item>
-    </style>
-
     <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
@@ -22,6 +18,10 @@
 
         <item name="colorButtonNormal">@color/primary_darker</item>
         <item name="android:colorButtonNormal">@color/primary_darker</item>
+    </style>
+
+    <style name="SplashTheme" parent="AppTheme.Dark">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
     </style>
 
     <style name="AppTheme.Dark.Dialog" parent="Theme.AppCompat.Dialog">
