@@ -8,6 +8,7 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import macroid.ContextWrapper
+import okhttp3.internal.http.HttpDate
 
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConverters._
@@ -43,11 +44,12 @@ object Client {
     name(name).
     value(value).
     httpOnly().
-    secure().
+    expiresAt(HttpDate.MAX_DATE).
     build()
 }
 
 object ClientHolder {
-  private lazy val cookieJar = new PersistentCookieJar(new SetCookieCache, new SharedPrefsCookiePersistor(Application.getContext))
+  lazy val sharedPrefsCookiePersistor = new SharedPrefsCookiePersistor(Application.getContext)
+  private lazy val cookieJar = new PersistentCookieJar(new SetCookieCache, sharedPrefsCookiePersistor)
   implicit lazy val okHttpClient = new OkHttpClient.Builder().cookieJar(cookieJar).build()
 }
