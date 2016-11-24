@@ -11,6 +11,7 @@ import android.view.Gravity
 import android.view.ViewGroup.LayoutParams
 import android.widget._
 import com.artkostm.flymer.communication.login.Login.AttemptLogin
+import com.artkostm.flymer.communication.okhttp3.ClientHolder
 import com.artkostm.flymer.view.Tweaks
 import macroid.Contexts
 import macroid.FullDsl._
@@ -65,7 +66,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
         w[TextView]
           <~ text("Login via Vk")
           <~ TextTweaks.size(16)
-          <~ Tweaks.mp(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT, bottom = 24 dp)
+          <~ Tweaks.mp(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, bottom = 24 dp)
           <~ Tweaks.textGravity(Gravity.CENTER)
           <~ Tweaks.clickable[TextView]
           <~ Tweaks.textFocusableInTouchMode
@@ -83,8 +84,13 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
         AttemptLogin(emailSlot.get.getText, passwordSlot.get.getText)
       } mapUi { loginInfoTry =>
         dialog.dismiss()
+        import com.artkostm.flymer.communication.okhttp3.Client._
         loginInfoTry match {
-          case Success(loginInfo) =>  toast(loginInfo.toString) <~ long <~ fry //runService
+          case Success(loginInfo) => {
+            ClientHolder.sharedPrefsCookiePersistor.saveAll(loginInfo)
+            runService()
+            toast(loginInfo.toString) <~ long <~ fry
+          }
           case Failure(e) => toast(e.getMessage) <~ long <~ fry
         }
       }
@@ -102,7 +108,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
   private def runService(): Unit = {
     val gcmManager = GcmNetworkManager.getInstance(LoginActivity.this)
     val task = new PeriodicTask.Builder().setService(classOf[PipelineService]).
-      setPeriod(30). setFlex(10). setTag(PipelineService.Tag).
+      setPeriod(60). setFlex(10). setTag(PipelineService.Tag).
       //setPersisted(true).
       build()
     val resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(LoginActivity.this)
