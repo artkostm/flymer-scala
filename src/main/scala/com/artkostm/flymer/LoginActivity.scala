@@ -17,7 +17,7 @@ import macroid.Contexts
 import macroid.FullDsl._
 import macroid._
 import com.artkostm.flymer.utils.FlymerHelper._
-import com.google.android.gms.gcm.{GcmNetworkManager, PeriodicTask, Task}
+import com.google.android.gms.gcm.{GcmNetworkManager, OneoffTask, PeriodicTask, Task}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -80,9 +80,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
     if(validate()) {
       val dialog = openDialog()
       import com.artkostm.flymer.Application._
-      Future {
-        AttemptLogin(emailSlot.get.getText, passwordSlot.get.getText)
-      } mapUi { loginInfoTry =>
+      AttemptLogin(emailSlot.get.getText, passwordSlot.get.getText) mapUi { loginInfoTry =>
         dialog.dismiss()
         import com.artkostm.flymer.communication.okhttp3.Client._
         loginInfoTry match {
@@ -108,11 +106,9 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
   //TODO: create oneOffTask here and move this code to the pipeline service to create periodic tasks with different periods
   private def runService(): Unit = {
     val gcmManager = GcmNetworkManager.getInstance(LoginActivity.this)
-    val task = new PeriodicTask.Builder().setService(classOf[PipelineService]).
-      setPeriod(60). setFlex(10). setTag(PipelineService.Tag).
+    val task = new OneoffTask.Builder().setService(classOf[PipelineService]).
+      setTag(PipelineService.TagOneOff).
       setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).
-      //setPersisted(true).
-      //setUpdateCurrent(true).
       build()
     val resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(LoginActivity.this)
     if (ConnectionResult.SUCCESS == resultCode) gcmManager.schedule(task)
