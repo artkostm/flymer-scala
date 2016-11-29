@@ -3,15 +3,11 @@ package com.artkostm.flymer.service
 import android.app.{NotificationManager, PendingIntent}
 import android.content.{Context, Intent}
 import android.support.v4.app.{NotificationCompat, TaskStackBuilder}
-import android.util.Log
-import com.artkostm.flymer.{Application, LoginActivity, R}
-import com.franmontiel.persistentcookiejar.PersistentCookieJar
-import com.franmontiel.persistentcookiejar.cache.SetCookieCache
-import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
-import com.google.android.gms.gcm.{GcmNetworkManager, GcmTaskService, TaskParams}
+import com.artkostm.flymer.{LoginActivity, R}
+import com.google.android.gms.common.{ConnectionResult, GoogleApiAvailability}
+import com.google.android.gms.gcm._
 import io.taig.communicator.Response
 import macroid.Contexts
-import okhttp3.OkHttpClient
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -24,14 +20,27 @@ class PipelineService extends GcmTaskService with Contexts[GcmTaskService] {
   override def onRunTask(taskParams: TaskParams): Int = {
     import com.artkostm.flymer.communication.okhttp3.Client._
     import com.artkostm.flymer.communication.okhttp3.ClientHolder._
-    print()
     val request = CheckReplies()
     import com.artkostm.flymer.Application._
     request.done {
       case Response(code, body) => sendNotification(body)
     } (Ui)
     Await.result(request, Duration.Inf)
+    createPeriodicTask(true)//TODO: check if the server response has greater then 0 replies
     GcmNetworkManager.RESULT_SUCCESS
+  }
+
+  def createPeriodicTask(wasNew: Boolean): Unit = {
+    val gcmManager = GcmNetworkManager.getInstance(this)
+        val task = new PeriodicTask.Builder().setService(classOf[PipelineService]).
+          setPeriod(PipelineService.calculateTime(wasNew)).
+          setFlex(PipelineService.Flex).setTag(PipelineService.TagPeriodic).
+          setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).
+          setPersisted(true).
+          setUpdateCurrent(true).
+          build()
+    val resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)
+    if (ConnectionResult.SUCCESS == resultCode) gcmManager.schedule(task)
   }
 
   def sendNotification(body: String): Unit = {
@@ -49,12 +58,17 @@ class PipelineService extends GcmTaskService with Contexts[GcmTaskService] {
     val mNotificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE).asInstanceOf[NotificationManager]
     mNotificationManager.notify(1, mBuilder.build())
   }
-
-  def print()(implicit okHttpClient: OkHttpClient): Unit = {
-    Log.i("SCALA", s"Http Client is ${okHttpClient}")
-  }
 }
 
 object PipelineService {
-  val Tag = "flymer_periodic_task"
+  val TagPeriodic = "flymer_periodic_task"
+  val TagOneOff = "flymer_oneOff_task"
+  val DefaultPeriod: Int = 20
+  val Flex: Int = 10
+  var Counter: Int = 0
+
+  def calculateTime(wasNew: Boolean): Int = wasNew match {
+    case true => DefaultPeriod
+    case false => Counter += Counter; DefaultPeriod + (DefaultPeriod * Counter * 0.1).toInt
+  }
 }
