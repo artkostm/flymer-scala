@@ -6,5 +6,5 @@ package com.artkostm.flymer.utils
 object Events {
   case class Event[T](source: T)
 
-  type EventHandler = PartialFunction[Event, Unit]
+  //type EventHandler = PartialFunction[Event, Unit]
 }
