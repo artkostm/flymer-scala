@@ -11,15 +11,15 @@ import android.view.Gravity
 import android.view.ViewGroup.LayoutParams
 import android.widget._
 import com.artkostm.flymer.communication.login.Login.AttemptLogin
+import com.artkostm.flymer.communication.login.{VkCookieInterceptor, VkLoginDialog}
 import com.artkostm.flymer.communication.okhttp3.ClientHolder
 import com.artkostm.flymer.view.Tweaks
 import macroid.Contexts
 import macroid.FullDsl._
 import macroid._
 import com.artkostm.flymer.utils.FlymerHelper._
-import com.google.android.gms.gcm.{GcmNetworkManager, OneoffTask, PeriodicTask, Task}
+import com.google.android.gms.gcm.{GcmNetworkManager, OneoffTask, Task}
 
-import scala.concurrent.Future
 import scala.util.{Failure, Success}
 import com.artkostm.flymer.service.PipelineService
 import com.google.android.gms.common.{ConnectionResult, GoogleApiAvailability}
@@ -62,7 +62,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
           <~ text("Login")
           <~ padding(all = 12 dp)
           <~ Tweaks.mp(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, top = 24 dp, bottom = 24 dp)
-          <~ On.click(flymerLogin),
+          <~ On.click(vkDialog),
         w[TextView]
           <~ text("Login via Vk")
           <~ TextTweaks.size(16)
@@ -74,6 +74,21 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
       ) <~ vertical
         <~ padding(top = 56 dp, left = 24 dp, right = 24 dp)
     ) <~ Tweaks.fitsSystemWindow(true) <~ Tweaks.fillViewport).get)
+  }
+
+  var vkDialogD: VkLoginDialog = _
+
+  lazy val vkDialog: Ui[Unit] = Ui {
+    vkDialogD = new VkLoginDialog(LoginActivity.this, interceptor)
+    vkDialogD.show()
+    toast("vk") <~ long <~ fry
+  }
+
+  val interceptor = new VkCookieInterceptor {
+    override def onCookieIntercepted(cookieString: String): Unit = {
+      if (vkDialogD != null) vkDialogD.dismiss()
+      toast(cookieString) <~ long <~ fry
+    }
   }
 
   lazy val flymerLogin: Ui[Unit] = Ui {
