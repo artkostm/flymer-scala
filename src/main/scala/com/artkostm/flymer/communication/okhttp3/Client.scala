@@ -38,6 +38,15 @@ object Client {
     buffer.asJava
   }
 
+  implicit def cookieStringToCookies(cookieStr: String) : java.util.List[Cookie] = {
+    val buffer = ListBuffer.empty[Cookie]
+    cookieStr.split(";").foreach(pair => {
+      val cookie = pair.split("=")
+      buffer += buildCookie(cookie(0).trim, cookie(1))
+    })
+    buffer.asJava
+  }
+
   protected def buildCookie(name: String, value: String): Cookie = new Cookie.Builder().
     domain(flymer.Domain).
     path("/").
