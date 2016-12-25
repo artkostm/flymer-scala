@@ -33,6 +33,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
   var loginBtn = slot[AppCompatButton]
   var emailSlot = slot[EditText]
   var passwordSlot = slot[EditText]
+  var vkDialogD: VkLoginDialog = _
 
   override def onCreate(savedInstanceState: Bundle): Unit = {
     super.onCreate(savedInstanceState)
@@ -62,7 +63,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
           <~ text("Login")
           <~ padding(all = 12 dp)
           <~ Tweaks.mp(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, top = 24 dp, bottom = 24 dp)
-          <~ On.click(vkDialog),
+          <~ On.click(flymerLogin),
         w[TextView]
           <~ text("Login via Vk")
           <~ TextTweaks.size(16)
@@ -74,21 +75,6 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
       ) <~ vertical
         <~ padding(top = 56 dp, left = 24 dp, right = 24 dp)
     ) <~ Tweaks.fitsSystemWindow(true) <~ Tweaks.fillViewport).get)
-  }
-
-  var vkDialogD: VkLoginDialog = _
-
-  lazy val vkDialog: Ui[Unit] = Ui {
-    vkDialogD = new VkLoginDialog(LoginActivity.this, interceptor)
-    vkDialogD.show()
-    toast("vk") <~ long <~ fry
-  }
-
-  val interceptor = new VkCookieInterceptor {
-    override def onCookieIntercepted(cookieString: String): Unit = {
-      if (vkDialogD != null) vkDialogD.dismiss()
-      toast(cookieString) <~ long <~ fry
-    }
   }
 
   lazy val flymerLogin: Ui[Unit] = Ui {
@@ -110,8 +96,19 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
     }
   }
 
+  val interceptor = new VkCookieInterceptor {
+    override def onCookieIntercepted(cookieString: String): Unit = {
+      if (vkDialogD != null) vkDialogD.dismiss()
+      import com.artkostm.flymer.communication.okhttp3.Client._
+      ClientHolder.sharedPrefsCookiePersistor.saveAll(cookieString)
+      //Toast.makeText(LoginActivity.this, cookieString, Toast.LENGTH_LONG).show
+    }
+  }
+
   lazy val vkLogin: Ui[Unit] = Ui {
-    toast("Sorry, not supported yet") <~ long <~ fry
+    vkDialogD = new VkLoginDialog(LoginActivity.this, interceptor)
+    vkDialogD.show()
+    toast("vk") <~ long <~ fry
   }
 
   override def onBackPressed(): Unit = moveTaskToBack(true)
@@ -123,7 +120,6 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
     val gcmManager = GcmNetworkManager.getInstance(LoginActivity.this)
     val task = new OneoffTask.Builder().setService(classOf[PipelineService]).
       setTag(PipelineService.TagOneOff).
-      setRequiredNetwork(Task.NETWORK_STATE_CONNECTED).
       build()
     val resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(LoginActivity.this)
     if (ConnectionResult.SUCCESS == resultCode) gcmManager.schedule(task)
