@@ -19,6 +19,11 @@ object Flymer {
   val Ac = "ac"
 
   val UserAgent = "Mozilla"
+
+  private val responseType = "code"
+  private val oauthVersion = "5.4"
+  private val clientId = 3206293
+  val OAuthUrl = s"https://oauth.vk.com/authorize?client_id=$clientId&scope=&redirect_uri=http%3A%2F%2F$Domain%2Foauth%2Fvk&response_type=$responseType&v=$oauthVersion"
 }
 
 case class FlymerError(errorType: String)
