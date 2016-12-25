@@ -3,8 +3,8 @@ package com.artkostm.flymer.communication.login
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.webkit.{CookieManager, WebView, WebViewClient}
+import com.artkostm.flymer.communication.Flymer
 
 /**
   * Created by artsiom.chuiko on 15/10/2016.
@@ -21,16 +21,14 @@ class VkLoginDialog(context: Context, interceptor: VkCookieInterceptor) extends 
 
   override def onCreate(savedInstanceState: Bundle): Unit = {
     setContentView(webView)
-    setTitle("Vk.com")
-    webView.loadUrl("https://oauth.vk.com/authorize?client_id=3206293&scope=&redirect_uri=http%3A%2F%2Fflymer.ru%2Foauth%2Fvk&response_type=code&v=5.4")
+    webView.loadUrl(Flymer.OAuthUrl)
   }
 }
 
 class VkWebViewClient(interceptor: VkCookieInterceptor) extends WebViewClient {
   override def onPageFinished(view: WebView, url: String): Unit = {
-    Log.i("VkWebViewClient.onPageFinished", url)
-    if (url.contains("http://flymer.ru")) {
-      val cookie = CookieManager.getInstance().getCookie("http://flymer.ru/")
+    if (url.contains(Flymer.BaseUrl)) {
+      val cookie = CookieManager.getInstance().getCookie(Flymer.BaseUrl)
       interceptor.onCookieIntercepted(cookie)
     }
   }
