@@ -88,6 +88,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
           case Success(loginInfo) => {
             ClientHolder.sharedPrefsCookiePersistor.saveAll(loginInfo)
             runService()
+            LoginActivity.this.finish()
             toast(loginInfo.toString) <~ long <~ fry
           }
           case Failure(e) => toast(e.getMessage) <~ long <~ fry
@@ -101,6 +102,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
       if (vkDialogD != null) vkDialogD.dismiss()
       import com.artkostm.flymer.communication.okhttp3.Client._
       ClientHolder.sharedPrefsCookiePersistor.saveAll(cookieString)
+      LoginActivity.this.finish()
       //Toast.makeText(LoginActivity.this, cookieString, Toast.LENGTH_LONG).show
     }
   }
