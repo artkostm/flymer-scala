@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.AppCompatButton
 import android.text.Html
 import android.util.Patterns
-import android.view.Gravity
+import android.view.{Gravity, View}
 import android.view.ViewGroup.LayoutParams
 import android.widget._
 import com.artkostm.flymer.communication.login.Login.AttemptLogin
@@ -117,7 +117,6 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
 
   def onLoginFailed(): Unit = loginBtn.get.setEnabled(true)
 
-  //TODO: create oneOffTask here and move this code to the pipeline service to create periodic tasks with different periods
   private def runService(): Unit = {
     val gcmManager = GcmNetworkManager.getInstance(LoginActivity.this)
     val task = new OneoffTask.Builder().setService(classOf[PipelineService]).
@@ -132,8 +131,10 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
     val email = emailSlot.get.getText.toString
     val password = passwordSlot.get.getText.toString
     var valid = true
+    var errorSlot: Option[View] = null
     def validateEmail(): Boolean = if (email.isEmpty || !Patterns.EMAIL_ADDRESS.matcher(email).matches) {
       emailSlot.get.setError(Html.fromHtml("<font color='red'>enter a valid email address</font>"))
+      errorSlot = emailSlot
       false
     } else {
       emailSlot.get.setError(null)
@@ -142,12 +143,14 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
 
     def validatePassword(): Boolean = if (password.isEmpty || password.length < 4 || password.length > 20) {
       passwordSlot.get.setError(Html.fromHtml("<font color='red'>between 4 and 20 alphanumeric characters</font>"))
+      errorSlot = passwordSlot
       false
     } else {
       passwordSlot.get.setError(null)
       true
     }
 
+    errorSlot.foreach(_.requestFocus())
     valid &&= validateEmail()
     valid && validatePassword()
   }
