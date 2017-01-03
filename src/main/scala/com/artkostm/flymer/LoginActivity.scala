@@ -2,7 +2,7 @@ package com.artkostm.flymer
 
 import android.app.{Activity, ProgressDialog}
 import android.os.Bundle
-import android.support.design.widget.TextInputLayout
+import android.support.design.widget.{TextInputEditText, TextInputLayout}
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.AppCompatButton
 import android.text.Html
@@ -31,8 +31,8 @@ import macroid.contrib.{ImageTweaks, TextTweaks}
 class LoginActivity extends AppCompatActivity with Contexts[Activity] {
 
   var loginBtn = slot[AppCompatButton]
-  var emailSlot = slot[EditText]
-  var passwordSlot = slot[EditText]
+  var emailSlot = slot[TextInputEditText]
+  var passwordSlot = slot[TextInputEditText]
   var vkDialogD: VkLoginDialog = _
 
   override def onCreate(savedInstanceState: Bundle): Unit = {
@@ -43,7 +43,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
           <~ ImageTweaks.res(R.drawable.logo)
           <~ Tweaks.mp(LayoutParams.WRAP_CONTENT, 76 dp, bottom = 24 dp, gravity = Gravity.CENTER_HORIZONTAL),
         l[TextInputLayout](
-          w[EditText]
+          w[TextInputEditText]
             <~ Tweaks.mp(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, top = 8 dp, bottom = 8 dp)
             <~ wire(emailSlot)
             <~ hint("Email")
@@ -51,7 +51,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
         ) <~ vertical
           <~ lp[LinearLayout](LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT),
         l[TextInputLayout](
-          w[EditText]
+          w[TextInputEditText]
             <~ Tweaks.mp(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, top = 8 dp, bottom = 8 dp)
             <~ wire(passwordSlot)
             <~ hint("Password")
@@ -102,8 +102,8 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
       if (vkDialogD != null) vkDialogD.dismiss()
       import com.artkostm.flymer.communication.okhttp3.Client._
       ClientHolder.sharedPrefsCookiePersistor.saveAll(cookieString)
+      runService()
       LoginActivity.this.finish()
-      //Toast.makeText(LoginActivity.this, cookieString, Toast.LENGTH_LONG).show
     }
   }
 
@@ -121,6 +121,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
     val gcmManager = GcmNetworkManager.getInstance(LoginActivity.this)
     val task = new OneoffTask.Builder().setService(classOf[PipelineService]).
       setTag(PipelineService.TagOneOff).
+      setExecutionWindow(5, 20).
       build()
     val resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(LoginActivity.this)
     if (ConnectionResult.SUCCESS == resultCode) gcmManager.schedule(task)
@@ -131,7 +132,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
     val email = emailSlot.get.getText.toString
     val password = passwordSlot.get.getText.toString
     var valid = true
-    var errorSlot: Option[View] = null
+    var errorSlot: Option[View] = Option.empty
     def validateEmail(): Boolean = if (email.isEmpty || !Patterns.EMAIL_ADDRESS.matcher(email).matches) {
       emailSlot.get.setError(Html.fromHtml("<font color='red'>enter a valid email address</font>"))
       errorSlot = emailSlot
@@ -150,9 +151,10 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
       true
     }
 
-    errorSlot.foreach(_.requestFocus())
     valid &&= validateEmail()
-    valid && validatePassword()
+    valid &&= validatePassword()
+    errorSlot.foreach(_.requestFocus())
+    valid
   }
 
   private def openDialog(): ProgressDialog = {
