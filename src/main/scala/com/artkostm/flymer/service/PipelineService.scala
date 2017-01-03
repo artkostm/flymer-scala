@@ -3,11 +3,13 @@ package com.artkostm.flymer.service
 import android.app.{NotificationManager, PendingIntent}
 import android.content.{Context, Intent}
 import android.support.v4.app.{NotificationCompat, TaskStackBuilder}
+import com.artkostm.flymer.communication.FlymerResponse
 import com.artkostm.flymer.{LoginActivity, R}
 import com.google.android.gms.common.{ConnectionResult, GoogleApiAvailability}
 import com.google.android.gms.gcm._
 import io.taig.communicator.Response
 import macroid.Contexts
+import spray.json._
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -22,11 +24,15 @@ class PipelineService extends GcmTaskService with Contexts[GcmTaskService] {
     import com.artkostm.flymer.communication.okhttp3.ClientHolder._
     val request = CheckReplies()
     import com.artkostm.flymer.Application._
+    import com.artkostm.flymer.communication.FlymerJsonProtocol._
     request.done {
-      case Response(code, body) => sendNotification(body)
+      case Response(code, body) => {
+        val num = body.parseJson.convertTo[FlymerResponse].replies.num.toInt
+        sendNotification(s"You have received $num replies!", num > 0)
+        createPeriodicTask(num > 0)//TODO: check if the server response has greater then 0 replies
+      }
     } (Ui)
     Await.result(request, Duration.Inf)
-    createPeriodicTask(true)//TODO: check if the server response has greater then 0 replies
     GcmNetworkManager.RESULT_SUCCESS
   }
 
@@ -43,20 +49,25 @@ class PipelineService extends GcmTaskService with Contexts[GcmTaskService] {
     if (ConnectionResult.SUCCESS == resultCode) gcmManager.schedule(task)
   }
 
-  def sendNotification(body: String): Unit = {
-    val mBuilder =
-      new NotificationCompat.Builder(this)
-        .setSmallIcon(R.drawable.ic_notification)
-        .setContentTitle("Flymer")
-        .setContentText(body)
-    val resultIntent = new Intent(this, classOf[LoginActivity])
-    val stackBuilder = TaskStackBuilder.create(this)
-    stackBuilder.addParentStack(classOf[LoginActivity])
-    stackBuilder.addNextIntent(resultIntent)
-    val resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
-    mBuilder.setContentIntent(resultPendingIntent)
+  def sendNotification(body: String, wasNew: Boolean): Unit = {
     val mNotificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE).asInstanceOf[NotificationManager]
-    mNotificationManager.notify(1, mBuilder.build())
+    wasNew match {
+      case false => mNotificationManager.cancel(1)
+      case true => {
+        val mBuilder =
+          new NotificationCompat.Builder(this)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Flymer")
+            .setContentText(body)
+        val resultIntent = new Intent(this, classOf[LoginActivity])
+        val stackBuilder = TaskStackBuilder.create(this)
+        stackBuilder.addParentStack(classOf[LoginActivity])
+        stackBuilder.addNextIntent(resultIntent)
+        val resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        mBuilder.setContentIntent(resultPendingIntent)
+        mNotificationManager.notify(1, mBuilder.build())
+      }
+    }
   }
 }
 
