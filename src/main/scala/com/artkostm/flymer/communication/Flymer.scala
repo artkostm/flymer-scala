@@ -1,5 +1,7 @@
 package com.artkostm.flymer.communication
 
+import spray.json._, DefaultJsonProtocol._
+
 /**
   * Created by artsiom.chuiko on 13/10/2016.
   */
@@ -26,5 +28,12 @@ object Flymer {
   val OAuthUrl = s"https://oauth.vk.com/authorize?client_id=$clientId&scope=&redirect_uri=http%3A%2F%2F$Domain%2Foauth%2Fvk&response_type=$responseType&v=$oauthVersion"
 }
 
-case class FlymerError(errorType: String)
-case class FlymerResponse(error: FlymerError)
+//case class FlymerError(errorType: String)
+case class FlymerReplies(num: String)
+case class FlymerResponse(replies: FlymerReplies)
+
+object FlymerJsonProtocol extends DefaultJsonProtocol {
+  //implicit val FlymerErrorFormat = jsonFormat1(FlymerError)
+  implicit val FlymerRepliesFormat = jsonFormat(FlymerReplies.apply _, "num")
+  implicit val FlymerResponseFormat = jsonFormat(FlymerResponse.apply _, "replies")
+}
