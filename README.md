@@ -1,4 +1,5 @@
 # flymer-scala
-![Flymer logo](/src/main/res/drawable/logo.png?raw=true "Flymer logo")
+![Flymer logo](http://flymer.ru/img/logo/logo.png "Flymer logo")
 
 This is a game project written in Scala using Macroid, JSoup and [Taig/communicator(2.3.2)](https://github.com/Taig/Communicator/tree/2.3.2)
+![Footer](http://flymer.ru/img/footer.png "Footer")
