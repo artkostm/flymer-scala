@@ -2,6 +2,7 @@ package com.artkostm.flymer.service
 
 import android.app.{NotificationManager, PendingIntent}
 import android.content.{Context, Intent}
+import android.net.Uri
 import android.support.v4.app.{NotificationCompat, TaskStackBuilder}
 import com.artkostm.flymer.communication.{Flymer, FlymerResponse}
 import com.artkostm.flymer.{LoginActivity, R}
@@ -30,8 +31,8 @@ class PipelineService extends GcmTaskService with Contexts[GcmTaskService] {
         val replies = body.parseJson.convertTo[FlymerResponse].replies
         val num = replies.num.toInt
         val url = replies.url
-        sendNotification(s"You have received $num replies!", url, num > 0)
-        createPeriodicTask(num > 0)//TODO: check if the server response has greater then 0 replies
+        sendNotification(url, num)
+        createPeriodicTask(num > 0)
       }
     } (Ui)
     Await.result(request, Duration.Inf)
@@ -51,18 +52,19 @@ class PipelineService extends GcmTaskService with Contexts[GcmTaskService] {
     if (ConnectionResult.SUCCESS == resultCode) gcmManager.schedule(task)
   }
 
-  def sendNotification(body: String, url: String, wasNew: Boolean): Unit = {
+  def sendNotification(url: Option[String], num: Int): Unit = {
     val mNotificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE).asInstanceOf[NotificationManager]
-    wasNew match {
+    num > 0 match {
       case false => mNotificationManager.cancel(Flymer.NotificationId)
       case true => {
         val mBuilder =
           new NotificationCompat.Builder(this)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("Flymer")
-            .setContentText(body + s"--$url")
-            .setAutoCancel(true).setNumber(num)
-        val resultIntent = new Intent(this, classOf[LoginActivity])
+            .setContentText(s"You have received $num replies!")
+            .setNumber(num)
+            .setAutoCancel(true)
+        val resultIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url.get.replace("\\", "")))
         val stackBuilder = TaskStackBuilder.create(this)
         stackBuilder.addParentStack(classOf[LoginActivity])
         stackBuilder.addNextIntent(resultIntent)
