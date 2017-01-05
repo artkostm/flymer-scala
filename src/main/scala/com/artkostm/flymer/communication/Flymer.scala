@@ -31,17 +31,11 @@ object Flymer {
 }
 
 //case class FlymerError(errorType: String)
-case class FlymerReplies(num: String, url: String)
-object FlymerReplies {
-  def apply(num: String, url: String): FlymerReplies = {
-    if (url == null) FlymerReplies(num, url)
-    else FlymerReplies(num, url.replaceAll("\\", ""))
-  }
-}
+case class FlymerReplies(num: String, url: Option[String])
 case class FlymerResponse(replies: FlymerReplies)
 
 object FlymerJsonProtocol extends DefaultJsonProtocol {
   //implicit val FlymerErrorFormat = jsonFormat1(FlymerError)
-  implicit val FlymerRepliesFormat = jsonFormat(FlymerReplies.apply _ _, "num", "url")
+  implicit val FlymerRepliesFormat = jsonFormat(FlymerReplies.apply, "num", "url")
   implicit val FlymerResponseFormat = jsonFormat(FlymerResponse.apply _, "replies")
 }
