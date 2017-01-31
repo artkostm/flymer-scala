@@ -7,7 +7,7 @@ import spray.json._, DefaultJsonProtocol._
   */
 object Flymer {
   val Domain = "flymer.ru"
-  val BaseUrl = s"http://$Domain"
+  val BaseUrl = s"https://$Domain"
   def LoginUrl(currentTime: Long) = s"$BaseUrl/req/login?ts=$currentTime"
 
   val Fkey = "fkey"
@@ -25,7 +25,7 @@ object Flymer {
   private val responseType = "code"
   private val oauthVersion = "5.4"
   private val clientId = 3206293
-  val OAuthUrl = s"https://oauth.vk.com/authorize?client_id=$clientId&scope=&redirect_uri=http%3A%2F%2F$Domain%2Foauth%2Fvk&response_type=$responseType&v=$oauthVersion"
+  val OAuthUrl = s"https://oauth.vk.com/authorize?client_id=$clientId&scope=&redirect_uri=https%3A%2F%2F$Domain%2Foauth%2Fvk&response_type=$responseType&v=$oauthVersion"
 
   val NotificationId = 1
 }
