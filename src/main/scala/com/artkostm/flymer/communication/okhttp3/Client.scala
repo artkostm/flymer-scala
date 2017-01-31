@@ -22,7 +22,7 @@ object Client {
     import io.taig.communicator._
     import com.artkostm.flymer.Application._
     Request
-      .prepare(s"http://flymer.ru/req/repcount?c=1&ts=${System.currentTimeMillis}")
+      .prepare(s"https://flymer.ru/req/repcount?c=1&ts=${System.currentTimeMillis}")
       .addHeader("Accept", "*/*")
       .addHeader("Host", "flymer.ru")
       .addHeader("Connection", "keep-alive")
