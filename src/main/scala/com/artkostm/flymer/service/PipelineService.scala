@@ -4,6 +4,7 @@ import android.app.{NotificationManager, PendingIntent}
 import android.content.{Context, Intent}
 import android.net.Uri
 import android.support.v4.app.{NotificationCompat, TaskStackBuilder}
+import android.util.Log
 import com.artkostm.flymer.communication.{Flymer, FlymerResponse}
 import com.artkostm.flymer.{LoginActivity, R}
 import com.google.android.gms.common.{ConnectionResult, GoogleApiAvailability}
@@ -28,6 +29,7 @@ class PipelineService extends GcmTaskService with Contexts[GcmTaskService] {
     import com.artkostm.flymer.communication.FlymerJsonProtocol._
     request.done {
       case Response(code, body) => {
+        Log.i("TEST_TEST", body)
         val replies = body.parseJson.convertTo[FlymerResponse].replies
         val num = replies.num.toInt
         val url = replies.url
