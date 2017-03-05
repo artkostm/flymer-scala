@@ -2,6 +2,7 @@ package com.artkostm.flymer.communication.login
 
 import android.app.Dialog
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.webkit.{CookieManager, WebView, WebViewClient}
 import com.artkostm.flymer.communication.Flymer
@@ -32,8 +33,11 @@ class VkWebViewClient(interceptor: VkCookieInterceptor) extends WebViewClient {
       interceptor.onCookieIntercepted(cookie)
     }
   }
+
+  override def onPageStarted(view: WebView, url: String, favicon: Bitmap): Unit = interceptor.onPageStarted()
 }
 
 trait VkCookieInterceptor {
   def onCookieIntercepted(cookieString: String): Unit
+  def onPageStarted(): Unit
 }
