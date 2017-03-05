@@ -99,12 +99,13 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
 
   val interceptor = new VkCookieInterceptor {
     override def onCookieIntercepted(cookieString: String): Unit = {
-      if (vkDialogD != null) vkDialogD.dismiss()
       import com.artkostm.flymer.communication.okhttp3.Client._
       ClientHolder.sharedPrefsCookiePersistor.saveAll(cookieString)
       runService()
       LoginActivity.this.finish()
     }
+
+    override def onPageStarted(): Unit = if (vkDialogD != null) vkDialogD.dismiss() //maybe just hide and then, in onCookieIntercepted, call dismiss()
   }
 
   lazy val vkLogin: Ui[Unit] = Ui {
