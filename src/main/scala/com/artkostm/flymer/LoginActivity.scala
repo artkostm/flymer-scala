@@ -16,7 +16,7 @@ import com.artkostm.flymer.view.Tweaks
 import macroid.Contexts
 import macroid.FullDsl._
 import macroid._
-import com.artkostm.flymer.utils.FlymerHelper._
+import com.artkostm.flymer.utils.FlymerImplicits._
 import com.google.android.gms.gcm.{GcmNetworkManager, OneoffTask}
 
 import scala.util.{Failure, Success}
@@ -79,13 +79,14 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
   lazy val flymerLogin: Ui[Unit] = Ui {
     if(validate()) {
       val dialog = openDialog()
+      val sharedPrefsPersistor = getApplication.asInstanceOf[Application].sharedPrefsCookiePersistor
       import com.artkostm.flymer.Application._
       attemptLogin(emailSlot.get.getText, passwordSlot.get.getText) mapUi { loginInfoTry =>
         dialog.dismiss()
         import com.artkostm.flymer.communication.okhttp3.Client._
         loginInfoTry match {
           case Success(loginInfo) => {
-            getApplication.asInstanceOf[Application].sharedPrefsCookiePersistor.saveAll(loginInfo)
+            sharedPrefsPersistor.saveAll(loginInfo)
             runService()
             LoginActivity.this.finish()
             toast(loginInfo.toString) <~ long <~ fry
