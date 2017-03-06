@@ -1,12 +1,8 @@
 package com.artkostm.flymer.communication.okhttp3
 
-import com.artkostm.flymer.Application
 import com.artkostm.flymer.communication.login.LoginInfo
 import okhttp3.{Cookie, OkHttpClient}
 import com.artkostm.flymer.communication.{Flymer => flymer}
-import com.franmontiel.persistentcookiejar.PersistentCookieJar
-import com.franmontiel.persistentcookiejar.cache.SetCookieCache
-import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
 import macroid.ContextWrapper
 import okhttp3.internal.http.HttpDate
 
@@ -18,7 +14,7 @@ import scala.collection.JavaConverters._
   */
 object Client {
 
-  def CheckReplies()(implicit okHttp: OkHttpClient, ctx: ContextWrapper) = {
+  def checkReplies()(implicit okHttp: OkHttpClient, ctx: ContextWrapper) = {
     import io.taig.communicator._
     import com.artkostm.flymer.Application._
     Request
@@ -55,10 +51,4 @@ object Client {
     httpOnly().
     expiresAt(HttpDate.MAX_DATE).
     build()
-}
-
-object ClientHolder {
-  lazy val sharedPrefsCookiePersistor = new SharedPrefsCookiePersistor(Application.getContext)
-  private lazy val cookieJar = new PersistentCookieJar(new SetCookieCache, sharedPrefsCookiePersistor)
-  implicit lazy val okHttpClient = new OkHttpClient.Builder().cookieJar(cookieJar).build()
 }

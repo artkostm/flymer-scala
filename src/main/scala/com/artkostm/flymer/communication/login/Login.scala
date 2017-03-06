@@ -19,7 +19,7 @@ object Login {
     })
   }
 
-  def AttemptLogin(email: String, pass: String)(implicit context: ExecutionContext): Future[Try[LoginInfo]] = Future {
+  def attemptLogin(email: String, pass: String)(implicit context: ExecutionContext): Future[Try[LoginInfo]] = Future {
     Try({
       val con = requestLoginPage()
       val doc = con.get

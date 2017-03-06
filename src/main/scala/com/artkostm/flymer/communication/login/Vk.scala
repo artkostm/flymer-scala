@@ -10,9 +10,6 @@ import com.artkostm.flymer.communication.Flymer
 /**
   * Created by artsiom.chuiko on 15/10/2016.
   */
-object Vk {
-
-}
 
 class VkLoginDialog(context: Context, interceptor: VkCookieInterceptor) extends Dialog(context) {
   val webView = new WebView(context)
