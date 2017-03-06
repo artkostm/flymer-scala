@@ -20,7 +20,9 @@
         <activity android:name=".LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.Dark"/>
-        <activity android:name=".UserActivity" />
+        <activity android:name=".UserActivity"
+            android:label="@string/user"
+            android:theme="@style/AppTheme.Dark"/>
 
         <service
             android:name=".service.PipelineService"

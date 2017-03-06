@@ -2,4 +2,5 @@
 <resources>
 	<string name="red">Red alert!</string>
 	<string name="app_name">Flymer</string>
+	<string name="user">User</string>
 </resources>
