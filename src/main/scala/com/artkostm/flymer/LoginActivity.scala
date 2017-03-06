@@ -15,6 +15,7 @@ import com.artkostm.flymer.communication.login.{VkCookieInterceptor, VkLoginDial
 import com.artkostm.flymer.view.Tweaks
 import macroid.Contexts
 import macroid.FullDsl._
+import macroid.{Ui => uinterface}
 import macroid._
 import com.artkostm.flymer.utils.FlymerImplicits._
 import com.google.android.gms.gcm.{GcmNetworkManager, OneoffTask}
@@ -89,7 +90,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
             sharedPrefsPersistor.saveAll(loginInfo)
             runService()
             LoginActivity.this.finish()
-            toast(loginInfo.toString) <~ long <~ fry
+            uinterface.nop
           }
           case Failure(e) => toast(e.getMessage) <~ long <~ fry
         }
@@ -111,7 +112,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
   lazy val vkLogin: Ui[Unit] = Ui {
     vkDialogD = new VkLoginDialog(LoginActivity.this, interceptor)
     vkDialogD.show()
-    toast("vk") <~ long <~ fry
+    uinterface.nop
   }
 
   override def onBackPressed(): Unit = moveTaskToBack(true)
