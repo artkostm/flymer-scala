@@ -10,15 +10,14 @@ import android.util.Patterns
 import android.view.{Gravity, View}
 import android.view.ViewGroup.LayoutParams
 import android.widget._
-import com.artkostm.flymer.communication.login.Login.AttemptLogin
+import com.artkostm.flymer.communication.login.Login.attemptLogin
 import com.artkostm.flymer.communication.login.{VkCookieInterceptor, VkLoginDialog}
-import com.artkostm.flymer.communication.okhttp3.ClientHolder
 import com.artkostm.flymer.view.Tweaks
 import macroid.Contexts
 import macroid.FullDsl._
 import macroid._
 import com.artkostm.flymer.utils.FlymerHelper._
-import com.google.android.gms.gcm.{GcmNetworkManager, OneoffTask, Task}
+import com.google.android.gms.gcm.{GcmNetworkManager, OneoffTask}
 
 import scala.util.{Failure, Success}
 import com.artkostm.flymer.service.PipelineService
@@ -81,12 +80,12 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
     if(validate()) {
       val dialog = openDialog()
       import com.artkostm.flymer.Application._
-      AttemptLogin(emailSlot.get.getText, passwordSlot.get.getText) mapUi { loginInfoTry =>
+      attemptLogin(emailSlot.get.getText, passwordSlot.get.getText) mapUi { loginInfoTry =>
         dialog.dismiss()
         import com.artkostm.flymer.communication.okhttp3.Client._
         loginInfoTry match {
           case Success(loginInfo) => {
-            ClientHolder.sharedPrefsCookiePersistor.saveAll(loginInfo)
+            getApplication.asInstanceOf[Application].sharedPrefsCookiePersistor.saveAll(loginInfo)
             runService()
             LoginActivity.this.finish()
             toast(loginInfo.toString) <~ long <~ fry
@@ -100,7 +99,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
   val interceptor = new VkCookieInterceptor {
     override def onCookieIntercepted(cookieString: String): Unit = {
       import com.artkostm.flymer.communication.okhttp3.Client._
-      ClientHolder.sharedPrefsCookiePersistor.saveAll(cookieString)
+      getApplication.asInstanceOf[Application].sharedPrefsCookiePersistor.saveAll(cookieString)
       runService()
       LoginActivity.this.finish()
     }
