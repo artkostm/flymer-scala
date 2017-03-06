@@ -2,25 +2,22 @@ package com.artkostm.flymer
 
 import java.util.concurrent.Executor
 
-import android.app.Service
-import android.content.Context
 import android.os.{AsyncTask, Handler, Looper}
+import com.franmontiel.persistentcookiejar.PersistentCookieJar
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
+import okhttp3.OkHttpClient
 
 import scala.concurrent.ExecutionContext
 
 /**
   * Created by artsiom.chuiko on 20/11/2016.
   */
-class Application extends android.app.Application {
-
-  override def onCreate(): Unit = {
-    super.onCreate
-    Application.context = this.getApplicationContext
-  }
+class Application extends android.app.Application with HttpClientProvider {
+  override def onCreate(): Unit = super.onCreate
 }
 
 object Application {
-  private var context: Context = _
 
   implicit lazy val Pool = ExecutionContext.fromExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
 
@@ -29,10 +26,10 @@ object Application {
 
     override def execute(command: Runnable) = handler.post(command)
   })
-
-  def getContext(): Context = context
 }
 
-trait ApplicationProvider { self: Service =>
-  implicit lazy val application = self.getApplication.asInstanceOf[Application]
+trait HttpClientProvider { app: android.app.Application =>
+  lazy val sharedPrefsCookiePersistor = new SharedPrefsCookiePersistor(app.getApplicationContext)
+  lazy val cookieJar = new PersistentCookieJar(new SetCookieCache, sharedPrefsCookiePersistor)
+  lazy val okHttpClient = new OkHttpClient.Builder().cookieJar(cookieJar).build()
 }
