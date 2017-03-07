@@ -89,7 +89,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
         loginInfoTry match {
           case Success(loginInfo) => {
             sharedPrefsPersistor.saveAll(loginInfo)
-            new SharedPrefs(getApplicationContext).save(Map("email" -> emailSlot.get.getText, "pass" -> passwordSlot.get.getText))
+            new SharedPrefs(getApplicationContext).save(Map(UserActivity.Email -> emailSlot.get.getText, UserActivity.Pass -> passwordSlot.get.getText))
             runService()
             LoginActivity.this.finish()
             uinterface.nop
@@ -105,7 +105,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
       import com.artkostm.flymer.communication.okhttp3.Client._
       getApplication.asInstanceOf[Application].sharedPrefsCookiePersistor.saveAll(cookieString)
       runService()
-      new SharedPrefs(getApplicationContext).save(Map("vk" -> "ok"))
+      new SharedPrefs(getApplicationContext).save(Map(UserActivity.Vk -> "ok"))
       LoginActivity.this.finish()
     }
 
