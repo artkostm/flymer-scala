@@ -22,6 +22,7 @@ import com.google.android.gms.gcm.{GcmNetworkManager, OneoffTask}
 
 import scala.util.{Failure, Success}
 import com.artkostm.flymer.service.PipelineService
+import com.artkostm.flymer.utils.SharedPrefs
 import com.google.android.gms.common.{ConnectionResult, GoogleApiAvailability}
 import macroid.contrib.{ImageTweaks, TextTweaks}
 
@@ -88,6 +89,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
         loginInfoTry match {
           case Success(loginInfo) => {
             sharedPrefsPersistor.saveAll(loginInfo)
+            new SharedPrefs(getApplicationContext).save(Map("emil" -> emailSlot.get.getText, "pass" -> passwordSlot.get.getText))
             runService()
             LoginActivity.this.finish()
             uinterface.nop
@@ -103,6 +105,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
       import com.artkostm.flymer.communication.okhttp3.Client._
       getApplication.asInstanceOf[Application].sharedPrefsCookiePersistor.saveAll(cookieString)
       runService()
+      new SharedPrefs(getApplicationContext).save(Map("vk" -> "ok"))
       LoginActivity.this.finish()
     }
 
