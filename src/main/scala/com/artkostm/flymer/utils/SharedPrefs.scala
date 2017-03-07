@@ -9,7 +9,7 @@ class SharedPrefs(context: Context) {
   val appPrefs = context.getSharedPreferences("FlymerApp", Context.MODE_PRIVATE)
 
   import scala.collection.JavaConversions._
-  def load(): Map[String, String] = appPrefs.getAll.entrySet().toMap[String, String]
+  def load() = appPrefs.getAll.toMap
 
   def save(prefMap: Map[String, String]): Unit = {
     val editor = appPrefs.edit()

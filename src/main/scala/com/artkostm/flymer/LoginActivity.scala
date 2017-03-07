@@ -89,7 +89,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
         loginInfoTry match {
           case Success(loginInfo) => {
             sharedPrefsPersistor.saveAll(loginInfo)
-            new SharedPrefs(getApplicationContext).save(Map("emil" -> emailSlot.get.getText, "pass" -> passwordSlot.get.getText))
+            new SharedPrefs(getApplicationContext).save(Map("email" -> emailSlot.get.getText, "pass" -> passwordSlot.get.getText))
             runService()
             LoginActivity.this.finish()
             uinterface.nop
