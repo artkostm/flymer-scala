@@ -79,7 +79,7 @@ class PipelineService extends GcmTaskService with Contexts[GcmTaskService] {
 object PipelineService {
   val TagPeriodic = "flymer_periodic_task"
   val TagOneOff = "flymer_oneOff_task"
-  val DefaultPeriod: Int = 20
+  val DefaultPeriod: Int = 15
   val Flex: Int = 10
   var Counter: Int = 0
 

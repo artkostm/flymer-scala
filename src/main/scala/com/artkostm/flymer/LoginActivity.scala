@@ -85,7 +85,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
       import com.artkostm.flymer.Application._
       attemptLogin(emailSlot.get.getText, passwordSlot.get.getText) mapUi { loginInfoTry =>
         dialog.dismiss()
-        import com.artkostm.flymer.communication.okhttp3.Client._
+        import com.artkostm.flymer.Implicits._
         loginInfoTry match {
           case Success(loginInfo) => {
             sharedPrefsPersistor.saveAll(loginInfo)
@@ -102,7 +102,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
 
   val interceptor = new VkCookieInterceptor {
     override def onCookieIntercepted(cookieString: String): Unit = {
-      import com.artkostm.flymer.communication.okhttp3.Client._
+      import com.artkostm.flymer.Implicits._
       getApplication.asInstanceOf[Application].sharedPrefsCookiePersistor.saveAll(cookieString)
       runService()
       new SharedPrefs(getApplicationContext).save(Map(UserActivity.Vk -> "ok"))
