@@ -1,11 +1,12 @@
 package com.artkostm.flymer
 
+import android.support.design.widget.TextInputEditText
 import com.artkostm.flymer.communication.login.LoginInfo
 import com.artkostm.flymer.communication.{Flymer => flymer}
 import okhttp3.Cookie
 import okhttp3.internal.http.HttpDate
-import scala.collection.JavaConverters._
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -30,6 +31,8 @@ object Implicits {
     })
     buffer.asJava
   }
+
+  implicit def editTextToString(editText: TextInputEditText): String = editText.getText.toString
 
   private[flymer] def buildCookie(name: String, value: String): Cookie = new Cookie.Builder().
     domain(flymer.Domain).

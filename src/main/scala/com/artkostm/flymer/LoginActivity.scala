@@ -44,7 +44,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
   }
 
   lazy val flymerLogin: Ui[Unit] = Ui {
-    if(validate()) {
+    if(validate) {
       val dialog = openDialog()
       val sharedPrefsPersistor = getApplication.asInstanceOf[Application].sharedPrefsCookiePersistor
       import com.artkostm.flymer.Application._
@@ -98,33 +98,21 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
     else Toast.makeText(LoginActivity.this, "Cannot run Google services", Toast.LENGTH_SHORT).show
   }
 
-  private def validate(): Boolean = {
-    val email = emailSlot.get.getText.toString
-    val password = passwordSlot.get.getText.toString
-    var valid = true
-    var errorSlot: Option[View] = Option.empty
-    def validateEmail(): Boolean = if (email.isEmpty || !Patterns.EMAIL_ADDRESS.matcher(email).matches) {
-      emailSlot.get.setError(Html.fromHtml("<font color='red'>enter a valid email address</font>"))
-      errorSlot = emailSlot
-      false
-    } else {
-      emailSlot.get.setError(null)
-      true
-    }
-
-    def validatePassword(): Boolean = if (password.isEmpty || password.length < 4 || password.length > 20) {
-      passwordSlot.get.setError(Html.fromHtml("<font color='red'>between 4 and 20 alphanumeric characters</font>"))
-      errorSlot = passwordSlot
-      false
-    } else {
-      passwordSlot.get.setError(null)
-      true
-    }
-
-    valid &&= validateEmail()
-    valid &&= validatePassword()
-    errorSlot.foreach(_.requestFocus())
-    valid
+  import com.artkostm.flymer.Implicits._
+  def validate: Boolean = {
+    val erroneous = List(EmailSlot(emailSlot), PasswordSlot(passwordSlot)).filter(slot => slot match {
+      case EmailSlot(Some(email)) if (email.isEmpty || !Patterns.EMAIL_ADDRESS.matcher(email).matches) => {
+        email.setError(Html.fromHtml("<font color='red'>enter a valid email address</font>"))
+        false
+      }
+      case PasswordSlot(Some(password)) if (password.isEmpty || password.length < 4 || password.length > 20) => {
+        password.setError(Html.fromHtml("<font color='red'>between 4 and 20 alphanumeric characters</font>"))
+        false
+      }
+      case _ => false
+    }).map(_.slot.getOrElse(None[TextInputEditText]))
+    erroneous.foreach(_.requestFocus())
+    erroneous.isEmpty
   }
 
   private def openDialog(): ProgressDialog = {
@@ -135,3 +123,7 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
     dialog
   }
 }
+
+case class Slot(slot: Option[TextInputEditText])
+case class EmailSlot(email: Option[TextInputEditText]) extends Slot(email)
+case class PasswordSlot(password: Option[TextInputEditText]) extends Slot(password)
