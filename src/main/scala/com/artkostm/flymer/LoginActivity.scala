@@ -103,11 +103,11 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
     val erroneous = List(EmailSlot(emailSlot), PasswordSlot(passwordSlot)).filter(slot => slot match {
       case EmailSlot(Some(email)) if (email.isEmpty || !Patterns.EMAIL_ADDRESS.matcher(email).matches) => {
         email.setError(Html.fromHtml("<font color='red'>enter a valid email address</font>"))
-        false
+        true
       }
       case PasswordSlot(Some(password)) if (password.isEmpty || password.length < 4 || password.length > 20) => {
         password.setError(Html.fromHtml("<font color='red'>between 4 and 20 alphanumeric characters</font>"))
-        false
+        true
       }
       case _ => false
     }).map(_.slot.getOrElse(None[TextInputEditText]))
