@@ -12,7 +12,7 @@ import android.view.ViewGroup.LayoutParams
 import android.widget._
 import com.artkostm.flymer.communication.login.Login.attemptLogin
 import com.artkostm.flymer.communication.login.{VkCookieInterceptor, VkLoginDialog}
-import com.artkostm.flymer.view.Tweaks
+import com.artkostm.flymer.view.{LoginView, Tweaks}
 import macroid.Contexts
 import macroid.FullDsl._
 import macroid.{Ui => uinterface}
@@ -38,44 +38,9 @@ class LoginActivity extends AppCompatActivity with Contexts[Activity] {
 
   override def onCreate(savedInstanceState: Bundle): Unit = {
     super.onCreate(savedInstanceState)
-    setContentView((l[ScrollView] (
-      l[LinearLayout] (
-        w[ImageView]
-          <~ ImageTweaks.res(R.drawable.logo)
-          <~ Tweaks.mp(LayoutParams.WRAP_CONTENT, 76 dp, bottom = 24 dp, gravity = Gravity.CENTER_HORIZONTAL),
-        l[TextInputLayout](
-          w[TextInputEditText]
-            <~ Tweaks.mp(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, top = 8 dp, bottom = 8 dp)
-            <~ wire(emailSlot)
-            <~ hint("Email")
-            <~ Tweaks.emailInputType
-        ) <~ vertical
-          <~ lp[LinearLayout](LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT),
-        l[TextInputLayout](
-          w[TextInputEditText]
-            <~ Tweaks.mp(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, top = 8 dp, bottom = 8 dp)
-            <~ wire(passwordSlot)
-            <~ hint("Password")
-            <~ Tweaks.password
-        ) <~ vertical
-          <~ lp[LinearLayout](LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT),
-        w[AppCompatButton]
-          <~ wire(loginBtn)
-          <~ text("Login")
-          <~ padding(all = 12 dp)
-          <~ Tweaks.mp(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, top = 24 dp, bottom = 24 dp)
-          <~ On.click(flymerLogin),
-        w[TextView]
-          <~ text("Login via Vk")
-          <~ TextTweaks.size(16)
-          <~ Tweaks.mp(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, bottom = 24 dp)
-          <~ Tweaks.textGravity(Gravity.CENTER)
-          <~ Tweaks.clickable[TextView]
-          <~ Tweaks.textFocusableInTouchMode
-          <~ On.click(vkLogin)
-      ) <~ vertical
-        <~ padding(top = 56 dp, left = 24 dp, right = 24 dp)
-    ) <~ Tweaks.fitsSystemWindow(true) <~ Tweaks.fillViewport).get)
+    setContentView {
+      Ui.get(LoginView.render(null))
+    }
   }
 
   lazy val flymerLogin: Ui[Unit] = Ui {
