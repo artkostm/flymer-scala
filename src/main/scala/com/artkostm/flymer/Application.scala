@@ -46,3 +46,4 @@ class LoginActionHandler[M](modelRW: ModelRW[M, User]) extends ActionHandler(mod
     case action: Action => ???
   }
 }
+
