@@ -6,7 +6,6 @@ import android.os.{AsyncTask, Handler, Looper}
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
-import diode._
 import okhttp3.OkHttpClient
 
 import scala.concurrent.ExecutionContext
