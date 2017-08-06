@@ -18,9 +18,13 @@ import macroid.contrib.{ImageTweaks, TextTweaks}
   * Created by artsiom.chuiko on 05/08/2017.
   */
 object Id extends IdGenerator(start = 1000)
-case class Slot(slot: Option[TextInputEditText])
-case class EmailSlot(email: Option[TextInputEditText]) extends Slot(email)
-case class PasswordSlot(password: Option[TextInputEditText]) extends Slot(password)
+sealed trait Slot { def slot: Option[TextInputEditText] }
+case class EmailSlot(email: Option[TextInputEditText]) extends Slot {
+  override def slot: Option[TextInputEditText] = email
+}
+case class PasswordSlot(password: Option[TextInputEditText]) extends Slot {
+  override def slot: Option[TextInputEditText] = password
+}
 
 object LoginView {
 
@@ -81,8 +85,10 @@ object LoginView {
         true
       }
       case _ => false
-    }).map(_.slot.getOrElse(None[TextInputEditText]))
-    erroneous.foreach(_.requestFocus())
+    }).map(_.slot)
+    erroneous.foreach(slot => slot match {
+      case Some(editText) => editText.requestFocus()
+    })
     erroneous.isEmpty
   }
 }
