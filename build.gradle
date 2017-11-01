@@ -61,7 +61,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile 'com.android.support:design:23.2.1'
-    compile 'org.scala-lang:scala-library:2.11.7'
+    compile 'org.scala-lang:scala-library:2.11.11'
     compile 'org.macroid:macroid_2.11:2.0.0-M5'
     compile 'org.macroid:macroid-viewable_2.11:2.0.0-M5'
     compile 'org.jsoup:jsoup:1.9.2'
