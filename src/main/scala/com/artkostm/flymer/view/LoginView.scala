@@ -7,7 +7,7 @@ import android.util.Patterns
 import android.view.{Gravity, View}
 import android.view.ViewGroup.LayoutParams
 import android.widget.{ImageView, LinearLayout, ScrollView, TextView}
-import com.artkostm.flymer._
+import com.artkostm.flymer.{FlymerLogin, R, VkLogin}
 import diode._
 import macroid.FullDsl._
 import macroid.Ui
@@ -88,6 +88,7 @@ object LoginView {
     }).map(_.slot)
     erroneous.foreach(slot => slot match {
       case Some(editText) => editText.requestFocus()
+      case _ => ???
     })
     erroneous.isEmpty
   }
