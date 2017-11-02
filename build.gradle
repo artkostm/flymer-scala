@@ -2,7 +2,7 @@ buildscript {
     repositories {
         jcenter()
         mavenCentral()
-	maven { url "https://jitpack.io" }
+	    maven { url "https://jitpack.io" }
     }
 
     dependencies {
@@ -73,7 +73,7 @@ tasks.withType(ScalaCompile) {
 }
 
 dependencies {
-    //scalaCompilerPlugin "org.scalamacros:paradise_2.11.7:2.1.0"
+    scalaCompilerPlugin 'org.scalameta:paradise_2.11.11:3.0.0-M10'
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile 'com.android.support:design:23.2.1'
     compile 'org.scala-lang:scala-library:2.11.11'
@@ -87,4 +87,10 @@ dependencies {
     compile 'io.spray:spray-json_2.11:1.3.3'
     compile 'io.suzaku:diode-core_2.11:1.1.2'
     compile 'org.typelevel:cats-core_2.11:1.0.0-MF'
+
+    compile "io.frees:frees-core_2.11:0.4.1"
+    compile "io.frees:frees-effects_2.11:0.4.1"
+    compile "io.frees:frees-tagless_2.11:0.4.1"
+    compile "io.frees:frees-async_2.11:0.4.1"
+    compile "io.frees:frees-async-cats-effect_2.11:0.4.1"
 }
