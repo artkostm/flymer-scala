@@ -7,6 +7,8 @@ buildscript {
 
     dependencies {
         classpath "com.android.tools.build:gradle:3.0.0"
+	//https://jitpack.io/#artkostm/gradle-android-scala-plugin/v1.6-j1.8-s2.12.4-g4.3
+	//'com.github.artkostm:gradle-android-scala-plugin:v1.6-j1.8-s2.12.4-g4.3'
         classpath 'com.github.artkostm:gradle-android-scala-plugin:1.6-j1.7-s2.11.11-g4.3'
         classpath 'com.google.gms:google-services:3.0.0'
     }
@@ -21,9 +23,18 @@ repositories {
 apply plugin: "com.android.application"
 apply plugin: "jp.leafytree.android-scala"
 
+configurations {
+    scalaCompilerPlugin
+}
+
 android {
     compileSdkVersion "android-23"
     buildToolsVersion '26.0.2'
+    //compileOptions { //min sdk version >= 26, current - 21
+    //    sourceCompatibility JavaVersion.VERSION_1_8
+    //    targetCompatibility JavaVersion.VERSION_1_8
+    //}
+
 	
     defaultConfig {
         applicationId "com.artkostm.flymer"
@@ -56,10 +67,13 @@ tasks.withType(ScalaCompile) {
     scalaCompileOptions.deprecation = false
     scalaCompileOptions.additionalParameters = ["-feature"]
     scalaCompileOptions.additionalParameters = ["-Ypartial-unification"]
+    scalaCompileOptions.additionalParameters = [
+        "-Xplugin:" + configurations.scalaCompilerPlugin.asPath
+    ]
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    //scalaCompilerPlugin "org.scalamacros:paradise_2.11.7:2.1.0"
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile 'com.android.support:design:23.2.1'
     compile 'org.scala-lang:scala-library:2.11.11'
