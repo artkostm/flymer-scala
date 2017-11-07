@@ -3,6 +3,7 @@ package com.artkostm.flymer.service
 import android.app.{NotificationManager, PendingIntent}
 import android.content.{Context, Intent}
 import android.net.Uri
+import android.provider.Browser
 import android.support.v4.app.{NotificationCompat, TaskStackBuilder}
 import com.artkostm.flymer.communication.{Flymer, FlymerResponse}
 import com.artkostm.flymer.{Application, LoginActivity, R}
@@ -65,6 +66,7 @@ class PipelineService extends GcmTaskService with Contexts[GcmTaskService] {
             .setNumber(num)
             .setAutoCancel(true)
         val resultIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url.get.replace("\\", "")))
+        resultIntent.putExtra(Browser.EXTRA_APPLICATION_ID, Flymer.getClass.getCanonicalName)
         val stackBuilder = TaskStackBuilder.create(this)
         stackBuilder.addParentStack(classOf[LoginActivity])
         stackBuilder.addNextIntent(resultIntent)
