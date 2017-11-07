@@ -1,6 +1,7 @@
 package com.artkostm.flymer.communication
 
-import spray.json._, DefaultJsonProtocol._
+import spray.json._
+import DefaultJsonProtocol._
 
 /**
   * Created by artsiom.chuiko on 13/10/2016.
