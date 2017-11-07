@@ -34,35 +34,39 @@ class LoginActionHandler[M](modelRW: ModelRW[M, User], activity: Activity with C
       vkDialogD.show()
       NoAction
     })
-    case FlymerLogin(Some(email), Some(password)) => updated(
-      value.copy(email, password), Effect(
-        program.loginViaFlymer((email, password)).interpret[Future].map(FlymerUser(_))
-      )
-    )
+    case FlymerLogin(Some(email), Some(password)) =>
+      updated(value.copy(email, password), Effect(
+        program.loginViaFlymer((email, password)).interpret[Future]
+          .map(li => FlymerUser(Success(li)))
+          .recover { case ex => FlymerUser(Failure(ex)) }
+      ))
     case FlymerUser(Success(loginInfo)) => effectOnly(Effect.action(SaveLoginInfo(loginInfo)))
-    case FlymerUser(Failure(e)) => effectOnly(Effect.action {
-      Toast.makeText(activity, e.getMessage, Toast.LENGTH_SHORT).show
-      NoAction
-    })
-    case SaveLoginInfo(info) => effectOnly(Effect.action {
-      import com.artkostm.flymer.Implicits._
-      val persistor = activity.getApplication.asInstanceOf[Application].sharedPrefsCookiePersistor
-      persistor.saveAll(info)
-      new SharedPrefs(activity.getApplicationContext).save(Map(UserActivity.Email -> value.email, UserActivity.Pass -> value.password))
-      RunService
-    })
-    case RunService => effectOnly(Effect.action {
-      val gcmManager = GcmNetworkManager.getInstance(activity)
-      val task = new OneoffTask.Builder().setService(classOf[PipelineService]).
-        setTag(PipelineService.TagOneOff).
-        setExecutionWindow(5, 20).
-        build()
-      val resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity)
-      if (ConnectionResult.SUCCESS == resultCode) gcmManager.schedule(task)
-      else Toast.makeText(activity, "Cannot run Google services", Toast.LENGTH_SHORT).show
-      activity.finish()
-      NoAction
-    })
+    case FlymerUser(Failure(e)) =>
+      effectOnly(Effect.action {
+        Toast.makeText(activity, e.getMessage, Toast.LENGTH_SHORT).show
+        NoAction
+      })
+    case SaveLoginInfo(info) =>
+      effectOnly(Effect.action {
+        import com.artkostm.flymer.Implicits._
+        val persistor = activity.getApplication.asInstanceOf[Application].sharedPrefsCookiePersistor
+        persistor.saveAll(info)
+        new SharedPrefs(activity.getApplicationContext).save(Map(UserActivity.Email -> value.email, UserActivity.Pass -> value.password))
+        RunService
+      })
+    case RunService =>
+      effectOnly(Effect.action {
+        val gcmManager = GcmNetworkManager.getInstance(activity)
+        val task = new OneoffTask.Builder().setService(classOf[PipelineService]).
+          setTag(PipelineService.TagOneOff).
+          setExecutionWindow(5, 20).
+          build()
+        val resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity)
+        if (ConnectionResult.SUCCESS == resultCode) gcmManager.schedule(task)
+        else Toast.makeText(activity, "Cannot run Google services", Toast.LENGTH_SHORT).show
+        activity.finish()
+        NoAction
+      })
   }
 
   override def onCookieIntercepted(cookieString: String): Unit = {
