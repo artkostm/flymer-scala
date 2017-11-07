@@ -1,6 +1,5 @@
 package com.artkostm.flymer.communication.login
 
-import android.util.Log
 import com.artkostm.flymer.communication.Flymer
 import com.artkostm.flymer.communication.login.algebras.Account
 import freestyle._
@@ -22,7 +21,7 @@ class Login [F[_]](implicit FLM: FlymerLoginModule[F]) {
 
   type FS[A] = FreeS[F, A]
 
-  def loginViaFlymer(account: Account): FS[Try[LoginInfo]] =
+  def loginViaFlymer(account: Account): FS[LoginInfo] =
     for {
       connection <- loader.loadLoginPage()
       document <- dataExtractor.extractDocument(connection)
@@ -31,8 +30,5 @@ class Login [F[_]](implicit FLM: FlymerLoginModule[F]) {
       lkey <- keyResolver.getLkey(document)
       dkey <- keyResolver.getDkey(fkey)
       ac <- loader.loadAccount(account, Tuple3(fkey, lkey, dkey), cookies)
-    } yield {
-      Log.i("FLYMER_APP", s"$ac, $fkey")
-      Try(LoginInfo(ac, fkey, cookies(Flymer.Sid)))
-    }
+    } yield LoginInfo(ac, fkey, cookies(Flymer.Sid))
 }
