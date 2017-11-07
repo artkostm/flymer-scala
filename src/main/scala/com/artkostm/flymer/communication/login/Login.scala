@@ -1,59 +1,38 @@
 package com.artkostm.flymer.communication.login
 
-import org.jsoup.nodes.Document
-import org.jsoup.{Connection, Jsoup}
-import com.artkostm.flymer.communication.{Flymer => flymer}
+import android.util.Log
+import com.artkostm.flymer.communication.Flymer
+import com.artkostm.flymer.communication.login.algebras.Account
+import freestyle._
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 /**
   * Created by artsiom.chuiko on 08/10/2016.
   */
-object Login {
 
-  def Dkey(fkey: String): Int = {
-    fkey.foldLeft(0)( (n, g) => {
-      val m = (n << 5) - n + g
-      m & m
-    })
-  }
-
-  def attemptLogin(email: String, pass: String)(implicit context: ExecutionContext): Future[Try[LoginInfo]] = Future {
-    Try({
-      val con = requestLoginPage()
-      val doc = con.get
-      val cookies = con.response.cookies
-      val fkey = getAttr(doc, flymer.FkeyCssSelector, "value")
-      val lkey = getAttr(doc, flymer.LkeyCssSelector, "value")
-      val dkey = Dkey(fkey)
-      cookies.put(flymer.Fkey, fkey)
-      val ac = requestAccount(email, pass, fkey, lkey, dkey, cookies)
-      new LoginInfo(ac, fkey, cookies.get(flymer.Sid))
-    })
-  }
-
-  protected def requestLoginPage(): Connection = Jsoup.connect(flymer.BaseUrl).userAgent(flymer.UserAgent).method(Connection.Method.GET)
-
-  protected def requestAccount(email: String, pass: String, fkey: String, lkey: String,
-                               dkey: Int, cookies: java.util.Map[String, String]): String = {
-    Jsoup.connect(flymer.LoginUrl(System.currentTimeMillis)).
-      data(flymer.Pass, pass).data(flymer.Email, email).
-      data(flymer.Fkey, fkey).data(flymer.Lkey, lkey).
-      data(flymer.Dkey, String.valueOf(dkey)).
-      header("Content-Type", "application/x-www-form-urlencoded").
-      header("Connection", "keep-alive").
-      cookies(cookies).
-      method(Connection.Method.POST).
-      execute().
-      cookie(flymer.Ac)
-  }
-
-  protected def getAttr(doc: Document, cssSelector: String, attrName: String): String = doc.select(cssSelector).first.attr(attrName)
-
-  protected def getAttr(cookies: java.util.Map[String, String], name: String): String = cookies.get(name)
+@module trait FlymerLoginModule {
+  val loader: PageLoader
+  val dataExtractor: PageDataExtractor
+  val keyResolver: KeyResolver
 }
 
-case class LoginInfo(ac: String, fkey: String, sid: String) {
-  override def toString: String = s"{ac:$ac\nfkey:$fkey\nsid:$sid}"
+class Login [F[_]](implicit FLM: FlymerLoginModule[F]) {
+  import FLM._
+
+  type FS[A] = FreeS[F, A]
+
+  def loginViaFlymer(account: Account): FS[Try[LoginInfo]] =
+    for {
+      connection <- loader.loadLoginPage()
+      document <- dataExtractor.extractDocument(connection)
+      cookies <- dataExtractor.extractCookies(connection)
+      fkey <- keyResolver.getFkey(document)
+      lkey <- keyResolver.getLkey(document)
+      dkey <- keyResolver.getDkey(fkey)
+      ac <- loader.loadAccount(account, Tuple3(fkey, lkey, dkey), cookies)
+    } yield {
+      Log.i("FLYMER_APP", s"$ac, $fkey")
+      Try(LoginInfo(ac, fkey, cookies(Flymer.Sid)))
+    }
 }
