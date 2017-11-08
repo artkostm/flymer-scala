@@ -1,7 +1,6 @@
 package com.artkostm.flymer.communication
 
 import spray.json._
-import DefaultJsonProtocol._
 
 /**
   * Created by artsiom.chuiko on 13/10/2016.
@@ -31,12 +30,12 @@ object Flymer {
   val NotificationId = 1
 }
 
-//case class FlymerError(errorType: String)
+case class FlymerError(`type`: String)
 case class FlymerReplies(num: String, url: Option[String])
-case class FlymerResponse(replies: FlymerReplies)
+case class FlymerResponse(replies: Option[FlymerReplies], error: Option[FlymerError])
 
 object FlymerJsonProtocol extends DefaultJsonProtocol {
-  //implicit val FlymerErrorFormat = jsonFormat1(FlymerError)
+  implicit val FlymerErrorFormat = jsonFormat(FlymerError.apply _, "type")
   implicit val FlymerRepliesFormat = jsonFormat(FlymerReplies.apply, "num", "url")
-  implicit val FlymerResponseFormat = jsonFormat(FlymerResponse.apply _, "replies")
+  implicit val FlymerResponseFormat = jsonFormat(FlymerResponse.apply, "replies", "error")
 }
