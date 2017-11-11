@@ -23,15 +23,19 @@
 
 # this can be omitted if current Android Build target is android-16
 -dontwarn org.scaloid.**
-
 -dontwarn java.nio.file.*
 -dontwarn android.support.customtabs.**
 -dontwarn android.net.http.**
 -dontwarn org.apache.http.**
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
--dontwarn okhttp3.**
--dontwarn okio.**
 -dontwarn android.support.v4.**
 -dontwarn android.support.v7.**
 -dontwarn com.google.android.gms.internal.**
 -dontwarn spray.json.**
+-dontnote okhttp3.internal.**
+-dontnote monix.execution.internals.**
+-dontwarn io.circe.generic.util.macros.**
+-dontwarn monix.execution.internals.**
+-dontwarn okio.**
+-dontwarn org.jctools.**
+-dontwarn org.slf4j.**
