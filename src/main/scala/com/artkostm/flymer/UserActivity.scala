@@ -31,7 +31,7 @@ class UserActivity extends AppCompatActivity with Contexts[Activity]{
         <~ Tweaks.textGravity(Gravity.CENTER),
       w[AppCompatButton]
         <~ On.click(Ui {
-          prefs.clear()
+          prefs.clear().commit()
           finish()
         })
         <~padding(all = 12 dp)
